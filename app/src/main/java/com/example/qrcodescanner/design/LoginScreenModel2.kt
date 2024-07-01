@@ -49,7 +49,6 @@ fun login2(navController: NavHostController){
         .fillMaxSize()
         .padding(start = 20.dp, end = 20.dp)
 
-
         Column(
             modifier= Modifier
                 .fillMaxSize()

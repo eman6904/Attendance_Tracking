@@ -6,18 +6,25 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.coding.APIs.ViewModel
+import com.example.qrcodescanner.coding.DataClasses.ExtraPoint
 
 
 @Composable
 fun attendanceList(navController: NavHostController){
 
+    val viewModel = ViewModel()
+    val token=stringResource(id = R.string.token)
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -26,6 +33,11 @@ fun attendanceList(navController: NavHostController){
        Column(
            modifier = Modifier.padding(top=5.dp)
        ){
+          // val traineeListState = viewModel.traineeList.collectAsState(initial = emptyList())
+           LaunchedEffect(Unit) {
+               viewModel.traineePointsUpdate( ExtraPoint("167989fa-b0cd-4f9f-bb56-43ee736007d1",10),"Bearer $token")
+           }
+
            columnItem()
            columnItem()
            columnItem()

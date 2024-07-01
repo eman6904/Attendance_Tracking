@@ -9,9 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -49,7 +47,7 @@ fun extraPoints(navHostController: NavHostController){
 
            Text(
                text="Extra Points",
-               fontSize = 25.sp,
+               fontSize = 30.sp,
                fontFamily = FontFamily(Font(R.font.bold2)),
                color= Color.White,
                modifier = Modifier.padding(bottom=40.dp)
@@ -152,6 +150,19 @@ fun selectPointAction(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                if(selectedItem=="Plus"){
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Color.Green
+                    )
+                }else if(selectedItem=="Minus"){
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
+                }
                 Text(
                     text = selectedItem,
                     modifier = Modifier
@@ -171,24 +182,44 @@ fun selectPointAction(
             }
         }
     }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        //to control dropDownMenu position
-        offset = DpOffset(x = (-1).dp, y = (-250).dp)
-    ) {
-        itemList.forEach {
-            DropdownMenuItem(
-                onClick = {
-                    expanded = false
-                    onItemSelected(it)
+    Box(){
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            //to control dropDownMenu position
+           // offset = DpOffset(x = (-1).dp, y = (-250).dp)
+        ) {
+            itemList.forEach {
+                DropdownMenuItem(
+                    onClick = {
+                        expanded = false
+                        onItemSelected(it)
+                    }
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        if(it=="Plus"){
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color.Green
+                            )
+                        }else{
+                            Icon(
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = null,
+                                tint = Color.Red
+                            )
+                        }
+                        Text(text = it, fontSize = 20.sp, color = Color.DarkGray)
+                    }
                 }
-            ) {
-                Text(text = it, fontSize = 20.sp, color = Color.DarkGray)
             }
         }
-    }
 
+    }
 }
 
 @Composable
@@ -232,10 +263,10 @@ fun updatePointsButton(){
         shape= RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
 
     ) {
-        Text(text="Update Points",
+        Text(text="Done",
             modifier = Modifier.padding(10.dp),
             color = Color.White,
-            fontSize = 17.sp,
+            fontSize = 20.sp,
             fontFamily = FontFamily(Font(R.font.bold2))
         )
     }
@@ -243,9 +274,6 @@ fun updatePointsButton(){
 @Composable
 fun ColumnItem(active:MutableState<Boolean>,item:String,searchedText:MutableState<String>){
 
-    Spacer(modifier = Modifier
-        .fillMaxWidth()
-        .height(12.dp))
     Text(
         text=item,
         modifier= Modifier
@@ -254,10 +282,9 @@ fun ColumnItem(active:MutableState<Boolean>,item:String,searchedText:MutableStat
                 active.value = false
             }
             .fillMaxWidth()
+            .padding(top=10.dp,bottom=10.dp)
     )
-    Spacer(modifier = Modifier
-        .fillMaxWidth()
-        .height(12.dp))
+
     Divider(modifier = Modifier
         .fillMaxWidth()
         .heightIn(1.dp))

@@ -1,29 +1,28 @@
 package com.example.qrcodescanner.design
 
+import android.preference.PreferenceManager
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.example.qrcodescanner.MainActivity.Companion.SELECTED_CAMP
+import com.example.qrcodescanner.MainActivity.Companion.sharedPreferences
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.ScreensRoute
 import com.example.qrcodescanner.coding.classes.BarcodeScanner
@@ -50,15 +49,20 @@ fun mainScreen(navHostController: NavHostController) {
                     .fillMaxSize()
                     .padding(start = 10.dp)
             ) {
-//                Image(
-//                    painterResource(R.drawable.blue_logo),
-//                    modifier = Modifier
-//                        .size(60.dp)
-//                        // .padding(top = 10.dp, bottom = 5.dp, start = 5.dp, end = 5.dp)
-//                        .aspectRatio(1f)
-//                        .clip(CircleShape),
-//                    contentDescription = "",
-//                )
+                Card(
+                    modifier = Modifier,
+                    shape = CircleShape,
+
+                    ){
+                    Image(
+                        painterResource(R.drawable.icpc_yellow_logo),
+                        modifier = Modifier
+                            .size(60.dp)
+                            .aspectRatio(1f)
+                        ,
+                        contentDescription = "",
+                    )
+                }
             }
 //            Box(
 //                contentAlignment = Alignment.CenterStart,
@@ -127,6 +131,26 @@ fun mainScreen(navHostController: NavHostController) {
 
 @Composable
 fun button(btnName: String,navController:NavHostController) {
+
+    var selectCamp= remember { mutableStateOf(false)}
+    if(selectCamp.value){
+
+        Dialog(
+            onDismissRequest = { selectCamp.value = false }
+        ) {
+           Card(
+               modifier = Modifier,
+               shape = RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
+               elevation = 10.dp
+           ) {
+              Column(
+                  modifier = Modifier.padding(15.dp)
+              ) {
+                  radioButtonforSelectCamp()
+              }
+           }
+        }
+    }
     Button(
         onClick = {
 
@@ -134,6 +158,9 @@ fun button(btnName: String,navController:NavHostController) {
                       navController.navigate(ScreensRoute.ExtraPointScreen.route)
             else if(btnName=="View Attendance")
                   navController.navigate(ScreensRoute.AttendanceScreen.route)
+            else
+                selectCamp.value=true
+
 
         },
         modifier = Modifier.fillMaxWidth(),
@@ -239,7 +266,8 @@ fun validation(
                         }
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .weight(1f)
                            ,
                         horizontalArrangement = Arrangement.Center
@@ -289,6 +317,41 @@ fun validation(
     }
 }
 
+@Composable
+fun radioButtonforSelectCamp() {
+    val Camps = listOf<String>(
+        "NewComers",
+        "Phase1",
+        "Phase2"
+    )
+
+    val savedCamp =sharedPreferences.getString(SELECTED_CAMP, null)
+    val selectedItem = remember { mutableStateOf(savedCamp) }
+
+    Column() {
+        Camps.forEach() { item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(10.dp)
+            ) {
+                RadioButton(
+                    modifier = Modifier.size(15.dp),
+                    selected = item == selectedItem.value,
+                    onClick = {
+                        selectedItem.value = item
+                        sharedPreferences.edit().putString(SELECTED_CAMP, selectedItem.value).apply()
+                              },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = colorResource(id = R.color.mainColor),
+                        unselectedColor = colorResource(id = R.color.mainColor),
+                        disabledColor = Color.DarkGray
+                    )
+                )
+                Text(text = item, modifier = Modifier.padding(start = 10.dp), fontSize = 20.sp)
+            }
+        }
+    }
+}
 
 
 
