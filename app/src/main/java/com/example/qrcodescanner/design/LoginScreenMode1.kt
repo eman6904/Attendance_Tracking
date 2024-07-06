@@ -22,11 +22,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.qrcodescanner.R
 
 @Composable
@@ -122,13 +125,13 @@ fun login1(){
     }
 }
 @Composable
-fun HalfCircle(color:Color) {
+fun HalfCircle(color:Color,startAngle:Int=-90,sweepAngle:Int=180) {
     Canvas(modifier = Modifier.fillMaxSize()) {
-        drawHalfCircle(this,color)
+        drawHalfCircle(this,color,startAngle,sweepAngle)
     }
 }
 
-fun drawHalfCircle(drawScope: DrawScope,color:Color) {
+fun drawHalfCircle(drawScope: DrawScope,color:Color,startAngle:Int=-90,sweepAngle:Int=180) {
     val canvasWidth = drawScope.size.width
     val canvasHeight = drawScope.size.height
 
@@ -137,8 +140,8 @@ fun drawHalfCircle(drawScope: DrawScope,color:Color) {
 
     drawScope.drawArc(
         color = color,
-        startAngle = -90f,
-        sweepAngle = 180f,
+        startAngle = startAngle.toFloat(),
+        sweepAngle = sweepAngle.toFloat(),
         useCenter = false,
         topLeft = Offset(-(canvasWidth)/2f, 0f),
         size = Size(diameter, diameter)
@@ -236,3 +239,66 @@ fun userNameField(userName: MutableState<String>, modifier: Modifier) {
     }
 }
 
+//Card(
+//modifier = Modifier
+//.width(300.dp)
+//.height(450.dp)
+//,shape = RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
+//elevation = 10.dp
+//) {
+//    Column(){
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .weight(1f)
+//        ){
+//            Row(){
+//                Box( modifier = Modifier
+//                    .fillMaxSize()
+//                    .weight(1f)){
+//                    Card(
+//                        modifier = Modifier.fillMaxSize()
+//                        , shape = RoundedCornerShape(0.dp,0.dp,1000.dp,0.dp),
+//                        elevation = 10.dp,
+//                        backgroundColor = colorResource(id = R.color.mainColor)
+//                    ){}
+//                }
+//                Box( modifier = Modifier
+//                    .fillMaxSize()
+//                    .weight(1f)){}
+//            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(100.dp),
+//                contentAlignment = Alignment.Center
+//            ){
+//                Card(
+//                    modifier = Modifier
+//                        .fillMaxWidth(),
+//                    elevation = 10.dp,
+//                    backgroundColor = colorResource(id = R.color.mainColor)
+//                ){
+//                    Box(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        contentAlignment = Alignment.Center
+//                    ){
+//                        Text(
+//                            text="All Camps ",
+//                            modifier = Modifier.padding(15.dp),
+//                            color=Color.White,
+//                            fontFamily = FontFamily(Font(R.font.bold2)),
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//                }
+//            }
+//
+//        }
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .weight(2f)
+//        ){
+//
+//        }

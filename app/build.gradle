@@ -85,5 +85,8 @@ dependencies {
     //converter
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1"
+
+
 
 }

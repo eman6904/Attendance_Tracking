@@ -240,4 +240,20 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
         )
     }
 }
+@Composable
+fun progressBar(show: MutableState<Boolean>) {
+
+    if (show.value) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            CircularProgressIndicator(
+                color = colorResource(id = R.color.mainColor), strokeWidth = 3.dp,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+    }
+
+}
 

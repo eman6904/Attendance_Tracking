@@ -1,5 +1,6 @@
 package com.example.qrcodescanner.design
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,15 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.coding.DataClasses.ExtraPoint
+import com.example.qrcodescanner.coding.DataClasses.ItemDetails
+import com.example.qrcodescanner.coding.functions.getAllTrainees
+import com.example.qrcodescanner.coding.functions.updatePoints
 
 @Composable
 fun extraPoints(navHostController: NavHostController){
@@ -41,49 +49,80 @@ fun extraPoints(navHostController: NavHostController){
     ){
 
         var pointType= listOf("Plus","Minus")
-        var selectedItem by remember { mutableStateOf("Points Action")}
+        var selectedAction by remember { mutableStateOf("Points Action")}
         var points = remember { mutableStateOf("")}
-        var searchedText = remember { mutableStateOf("")}
-
+        var points2 = remember { mutableStateOf(0)}
+        var searchedTrainee = remember { mutableStateOf("")}
+        var traineeId = remember { mutableStateOf("")}
+        val traineeNameRequired=remember{ mutableStateOf(false)}
+        val pointsRequired=remember{ mutableStateOf(false)}
+        val pointActionRequired=remember{ mutableStateOf(false)}
+        val showSending=remember{ mutableStateOf(false)}
+        if(points.value!="")
+            points2.value=points.value.toInt()
            Text(
                text="Extra Points",
                fontSize = 30.sp,
                fontFamily = FontFamily(Font(R.font.bold2)),
                color= Color.White,
-               modifier = Modifier.padding(bottom=40.dp)
+               modifier = Modifier.padding(bottom=30.dp)
            )
-           space(h = 15)
-           search(searchedText)
-           space(h = 15)
+           space(h = 30)
+           search(searchedTrainee,traineeId)
+           requiredField(show = traineeNameRequired)
+           space(h = 50)
            pointsField(points = points)
-           space(h = 15)
+          requiredField(show = pointsRequired)
+           space(h =50)
            selectPointAction(
                itemList = pointType,
-               selectedItem =selectedItem ,
-               onItemSelected ={selectedItem=it}
+               selectedItem =selectedAction ,
+               onItemSelected ={selectedAction=it}
            )
-           space(h = 15)
-           updatePointsButton()
+          requiredField(show = pointActionRequired)
+           space(h = 25)
+           updatePointsButton(
+               traineeNameRequired,
+               pointsRequired,
+               pointActionRequired,
+               traineeId,
+               points2,
+               selectedAction,
+               onItemSelected ={selectedAction=it},
+               points,
+               searchedTrainee,
+               showSending
+           )
+           if(showSending.value){
+               Text(
+                   text="Sending....",
+                   color=Color.White,
+                   textAlign = TextAlign.Center
+               )
+           }
        }
 
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun search(searchedText:MutableState<String>){
+fun search(searchedTrainee:MutableState<String>,traineeId:MutableState<String>){
 
-    var list= mutableListOf<String>("eman","esraa","hoda","hend","rana","rola")
+    var trainees=remember{ mutableListOf<ItemDetails>()}
+    getAllTrainees(trainees = trainees)
+    val showProgress=remember{ mutableStateOf(false)}
+    showProgress.value=(trainees.size==0)
     var active = remember  { mutableStateOf(false)}
     SearchBar(
         modifier= Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(start = 15.dp, end = 15.dp),
         shape= RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
         colors=SearchBarDefaults.colors(
             containerColor = Color.White
         ),
-        query=searchedText.value,
+        query=searchedTrainee.value,
         onQueryChange={
-            searchedText.value=it
+            searchedTrainee.value=it
         },
         onSearch={
             active.value=false
@@ -101,8 +140,8 @@ fun search(searchedText:MutableState<String>){
             if(active.value){
                 Icon(
                     modifier=Modifier.clickable {
-                        if(searchedText.value.isNotEmpty()) {
-                            searchedText.value = ""
+                        if(searchedTrainee.value.isNotEmpty()) {
+                            searchedTrainee.value = ""
                             active.value=false
                         }
                         else
@@ -113,15 +152,16 @@ fun search(searchedText:MutableState<String>){
             }
         }
     ){
+        progressBar(show = showProgress)
        LazyColumn(
            modifier = Modifier
                .padding(10.dp)
                .fillMaxSize(),
        ){
-         items(items =list.filter {
-             it.contains(searchedText.value)
+         items(items =trainees.filter {
+             it.name.contains(searchedTrainee.value)
          }){
-           ColumnItem(active = active, item = it, searchedText = searchedText)
+           ColumnItem(active = active, trainee = it, searchedText = searchedTrainee,traineeId)
          }
        }
     }
@@ -138,7 +178,7 @@ fun selectPointAction(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp)
+            .padding(start = 15.dp, end = 15.dp)
             .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
     ) {
         OutlinedButton(
@@ -228,7 +268,7 @@ fun pointsField(points: MutableState<String>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(start = 15.dp, end = 15.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
     ) {
@@ -251,38 +291,92 @@ fun pointsField(points: MutableState<String>) {
     }
 }
 @Composable
-fun updatePointsButton(){
-    Button(
-        onClick = {},
+fun updatePointsButton(
+    traineeNameRequire:MutableState<Boolean>,
+    pointsRequired:MutableState<Boolean>,
+    pointActionRequired:MutableState<Boolean>,
+    traineeId:MutableState<String>,
+    points:MutableState<Int>,
+    pointsAction:String,
+    onItemSelected: (pointsAction: String) -> Unit,
+    pointss:MutableState<String>,
+    searchedTrainee:MutableState<String>,
+    showSending:MutableState<Boolean>
+){
+
+    if(pointsAction=="Minus"&&points.value>0)
+        points.value*=-1
+
+    val showMessage=remember{ mutableStateOf(false)}
+    val isSuccess=remember{ mutableStateOf(false)}
+    val message=remember{ mutableStateOf("")}
+    val lifecycleOwner = LocalLifecycleOwner.current
+    if(message.value.isNotEmpty()) {
+        showMessage.value = true
+        showSending.value=false
+    }
+    if(showMessage.value)
+        message(showMessage = showMessage,isSuccess=isSuccess,message)
+
+    Card(
         modifier = Modifier
+            .clickable {
+
+                if (searchedTrainee.value.isNotEmpty() && pointss.value.isNotEmpty() && pointsAction != "Points Action") {
+                    updatePoints(
+                        extraPoint = ExtraPoint(traineeId.value, points.value),
+                        isSuccess = isSuccess, message, lifecycleOwner
+                    )
+                    showSending.value = true
+
+                    traineeNameRequire.value = (searchedTrainee.value.isEmpty())
+                    pointsRequired.value = (pointss.value.isEmpty())
+                    pointActionRequired.value = (pointsAction == "Points Action")
+
+                    onItemSelected("Points Action")
+                    pointss.value = ""
+                    searchedTrainee.value = ""
+
+                } else {
+
+                    traineeNameRequire.value = (searchedTrainee.value.isEmpty())
+                    pointsRequired.value = (pointss.value.isEmpty())
+                    pointActionRequired.value = (pointsAction == "Points Action")
+                }
+
+            }
             .fillMaxWidth()
             .padding(15.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = colorResource(id = R.color.mainColor2),
-        ),
+           backgroundColor = colorResource(id = R.color.mainColor2),
         shape= RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
+        elevation = 15.dp
 
     ) {
         Text(text="Done",
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(15.dp),
             color = Color.White,
             fontSize = 20.sp,
+            textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(R.font.bold2))
         )
     }
 }
 @Composable
-fun ColumnItem(active:MutableState<Boolean>,item:String,searchedText:MutableState<String>){
+fun ColumnItem(active:MutableState<Boolean>, trainee:ItemDetails,
+               searchedText:MutableState<String>,
+               traineeId:MutableState<String>
+){
 
     Text(
-        text=item,
+        text=trainee.name,
         modifier= Modifier
             .clickable {
-                searchedText.value = item
+                searchedText.value = trainee.name
+                traineeId.value = trainee.id
                 active.value = false
             }
             .fillMaxWidth()
-            .padding(top=10.dp,bottom=10.dp)
+            .padding(top = 10.dp, bottom = 10.dp)
     )
 
     Divider(modifier = Modifier
@@ -295,4 +389,122 @@ fun space(h:Int){
         .height(h.dp)
         .fillMaxWidth())
 }
+@Composable
+fun message(
+    showMessage:MutableState<Boolean>,
+    isSuccess:MutableState<Boolean>,
+    message:MutableState<String>
+){
 
+    if(showMessage.value){
+
+        Dialog(
+            onDismissRequest = {
+            showMessage.value=false
+            message.value=""
+        }) {
+
+            Card(
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
+                elevation = 10.dp
+            ){
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(15.dp)
+                ){
+                    if(isSuccess.value){
+                    Icon(
+                        painter = painterResource(R.drawable.done2),
+                        contentDescription = null,
+                        tint= colorResource(id = R.color.mainColor),
+                        modifier = Modifier
+                            .weight(1f)
+                            .size(90.dp)
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = "Success!",
+                            modifier = Modifier,
+                            fontSize = 25.sp,
+                            fontFamily = FontFamily(Font(R.font.bold2))
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = "Trainee points have been updated. ",
+                                modifier = Modifier
+                            )
+                        }else{
+
+                            Text(
+                                text = message.value,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd
+                    ){
+                       if(isSuccess.value){
+                           Button(
+                               onClick = {
+                                          showMessage.value=false
+                                          message.value=""
+                                         },
+                               colors=ButtonDefaults.buttonColors(
+                                   backgroundColor = colorResource(id = R.color.mainColor)
+                               )
+                           ) {
+                               Text(
+                                   text="OK",
+                                   fontSize = 15.sp,
+                                   color=Color.White,
+                                   fontFamily = FontFamily(Font(R.font.bold2))
+                               )
+                           }
+                       }else{
+                           Button(
+                               onClick = {
+                                            showMessage.value=false
+                                            message.value=""
+                                         },
+                               colors=ButtonDefaults.buttonColors(
+                                   backgroundColor = Color.Red
+                               )
+                           ) {
+                               Text(
+                                   text="OK",
+                                   fontSize = 15.sp,
+                                   color=Color.White,
+                                   fontFamily = FontFamily(Font(R.font.bold2))
+                               )
+                           }
+                       }
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun requiredField(show:MutableState<Boolean>){
+
+    if(show.value){
+
+       Box(
+           modifier = Modifier
+               .fillMaxWidth()
+               .padding(start = 15.dp, end = 15.dp),
+           contentAlignment = Alignment.TopStart
+       ){
+           Text(
+               text="*this field is required",
+               color= colorResource(id = R.color.red)
+           )
+       }
+    }
+}

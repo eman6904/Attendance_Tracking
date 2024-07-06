@@ -1,6 +1,6 @@
 package com.example.qrcodescanner.coding.DataClasses
 
-data class Details(
+data class ItemDetails(
     val id: String,
     val name: String,
 )
