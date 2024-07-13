@@ -1,6 +1,5 @@
 package com.example.qrcodescanner.design
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,7 +32,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.coding.DataClasses.ExtraPoint
-import com.example.qrcodescanner.coding.DataClasses.ItemDetails
+import com.example.qrcodescanner.coding.DataClasses.ItemData
 import com.example.qrcodescanner.coding.functions.getAllTrainees
 import com.example.qrcodescanner.coding.functions.updatePoints
 
@@ -107,8 +106,10 @@ fun extraPoints(navHostController: NavHostController){
 @Composable
 fun search(searchedTrainee:MutableState<String>,traineeId:MutableState<String>){
 
-    var trainees=remember{ mutableListOf<ItemDetails>()}
-    getAllTrainees(trainees = trainees)
+    var trainees=remember{ mutableListOf<ItemData>()}
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(Unit)
+    { getAllTrainees(trainees = trainees, lifecycleOwner = lifecycleOwner) }
     val showProgress=remember{ mutableStateOf(false)}
     showProgress.value=(trainees.size==0)
     var active = remember  { mutableStateOf(false)}
@@ -338,7 +339,6 @@ fun updatePointsButton(
                     searchedTrainee.value = ""
 
                 } else {
-
                     traineeNameRequire.value = (searchedTrainee.value.isEmpty())
                     pointsRequired.value = (pointss.value.isEmpty())
                     pointActionRequired.value = (pointsAction == "Points Action")
@@ -362,7 +362,7 @@ fun updatePointsButton(
     }
 }
 @Composable
-fun ColumnItem(active:MutableState<Boolean>, trainee:ItemDetails,
+fun ColumnItem(active:MutableState<Boolean>, trainee:ItemData,
                searchedText:MutableState<String>,
                traineeId:MutableState<String>
 ){
@@ -447,7 +447,7 @@ fun message(
                     Spacer(modifier = Modifier.height(10.dp))
                     Box(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterEnd
+                        contentAlignment = Alignment.BottomCenter
                     ){
                        if(isSuccess.value){
                            Button(
@@ -456,8 +456,9 @@ fun message(
                                           message.value=""
                                          },
                                colors=ButtonDefaults.buttonColors(
-                                   backgroundColor = colorResource(id = R.color.mainColor)
-                               )
+                                   backgroundColor = colorResource(id = R.color.mainColor),
+                               ),
+                               modifier = Modifier.fillMaxWidth()
                            ) {
                                Text(
                                    text="OK",
@@ -474,7 +475,8 @@ fun message(
                                          },
                                colors=ButtonDefaults.buttonColors(
                                    backgroundColor = Color.Red
-                               )
+                               ),
+                               modifier = Modifier.fillMaxWidth()
                            ) {
                                Text(
                                    text="OK",

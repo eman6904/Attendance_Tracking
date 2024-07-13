@@ -17,62 +17,70 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.coding.APIs.ViewModel
-import com.example.qrcodescanner.coding.DataClasses.ItemDetails
+import com.example.qrcodescanner.coding.DataClasses.ItemData
+import com.example.qrcodescanner.coding.functions.getCurrentCamp
 import com.example.qrcodescanner.coding.functions.getPresentTrainees
 
 
 @Composable
-fun attendanceList(navController: NavHostController){
+fun attendanceList(navController: NavHostController) {
 
 
-    val showProgress=remember{ mutableStateOf(false)}
+    val showProgress = remember { mutableStateOf(false) }
     // Use mutableStateListOf to hold the list of details
-    val presentTraineeList = remember { mutableStateListOf<ItemDetails>() }
-    val itemsCase=remember{ mutableStateOf("")}
-    val noSession=remember{ mutableStateOf(false)}
-    getPresentTrainees(trainees = presentTraineeList,itemsCase)
+    val presentTraineeList = remember { mutableStateListOf<ItemData>() }
+    val itemsCase = remember { mutableStateOf("") }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    showProgress.value=(presentTraineeList.isEmpty())
+    LaunchedEffect(Unit)
+    {
+        getPresentTrainees(
+            trainees = presentTraineeList,
+            itemsCase= itemsCase,
+           lifecycleOwner= lifecycleOwner,
+            showProgress=showProgress
+        )
+    }
+
+    showProgress.value = (presentTraineeList.isEmpty())
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         topBar(navController = navController)
-       Column(
-           modifier = Modifier.padding(top=5.dp)
+        Column(
+            modifier = Modifier.padding(top = 5.dp)
 
-       ){
-            if(noSession.value){
+        ) {
 
-            }else{
-                if(itemsCase.value=="No trainee has presented yet"){
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Text(text=itemsCase.value)
-                    }
-                }else{
-                    progressBar(show = showProgress)
-                    LazyColumn(){
+               if (itemsCase.value == "No trainee has presented yet" || itemsCase.value == "No current session for now.") {
+                   Box(
+                       modifier = Modifier.fillMaxSize(),
+                       contentAlignment = Alignment.Center
+                   ) {
+                       Text(text = itemsCase.value)
+                   }
+               } else {
+                   progressBar(show = showProgress)
+                   LazyColumn() {
 
-                        items(presentTraineeList){ trainee->
+                       items(presentTraineeList) { trainee ->
 
-                            columnItem(traineeName = trainee.name, campName ="campName" )
-                        }
-                    }
-                }
-            }
-       }
+                           columnItem(traineeName = trainee.name)
+                       }
+                   }
+               }
+
+        }
     }
 }
+
 @Composable
 fun topBar(navController: NavHostController) {
 
@@ -92,14 +100,14 @@ fun topBar(navController: NavHostController) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = "Attendance List", color = Color.White) },
+                    title = { Text(text = getCurrentCamp()!!.name+" Camp", color = Color.White) },
                     navigationIcon = {
                         IconButton(onClick = {
                             navController.popBackStack()
                         }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription =null,
+                                contentDescription = null,
                                 tint = Color.White
                             )
                         }
@@ -112,8 +120,9 @@ fun topBar(navController: NavHostController) {
         ) {}
     }
 }
+
 @Composable
-fun columnItem(traineeName:String,campName:String){
+fun columnItem(traineeName: String) {
 
     Card(
         modifier = Modifier
@@ -126,7 +135,7 @@ fun columnItem(traineeName:String,campName:String){
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
 
-        ){
+            ) {
 
             Icon(
                 painter = painterResource(R.drawable.person_icon),
@@ -138,15 +147,16 @@ fun columnItem(traineeName:String,campName:String){
             )
 
             Column(
-               // horizontalAlignment = Alignment.CenterHorizontally,
+                // horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(5f)
-            ){
-                Text(traineeName)
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp))
-                Text(campName)
+            ) {
+               Row(
+                   horizontalArrangement = Arrangement.Center
+               ){
+
+                   Text(traineeName)
+               }
             }
         }
     }

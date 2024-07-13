@@ -1,9 +1,9 @@
 package com.example.qrcodescanner.coding.DataClasses
 
-data class ApiResponse(
+data class LoginResponse(
     val statusCode: Int,
     val isSuccess: Boolean,
     val message: String,
-    val data: ArrayList<ItemData> = arrayListOf(),
-    val errors: Any?
+    val data: UserData?,
+    val errors: String?
 )
