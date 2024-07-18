@@ -11,6 +11,8 @@
     <color name="red">#FF0000</color>
     <color name="mainColor">#095583</color>
     <color name="mainColor2">#116598</color>
+    <color name="cf_color_inN">#F4A92F</color>
+    <color name="cf_color_inL">#4E4D4B</color>
 </resources>
 <!--  red #9A1E2D-->
 <!--  yellow  #FBA940-->

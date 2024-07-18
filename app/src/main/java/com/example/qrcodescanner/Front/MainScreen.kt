@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -34,6 +34,7 @@ import com.example.qrcodescanner.Back.DataClasses.ItemData
 import com.example.qrcodescanner.Back.DataClasses.UserData
 import com.example.qrcodescanner.Back.classes.BarcodeScanner
 import com.example.qrcodescanner.Back.functions.*
+import com.example.qrcodescanner.MainActivity
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
@@ -57,8 +58,16 @@ fun mainScreen(navController: NavHostController) {
 
     val  errorMessage= remember { mutableStateOf("")}
     val  shutDownError= remember { mutableStateOf(false)}
-
     errorDialog(shutDownError,errorMessage)
+
+    val showMenu=remember{ mutableStateOf(false)}
+    if(showMenu.value)
+        menuItems(
+            navController = navController,
+            showMenu = showMenu,
+            errorMessage = errorMessage,
+            shutDownError = shutDownError
+        )
 
     Box(){
         Column(
@@ -89,10 +98,19 @@ fun mainScreen(navController: NavHostController) {
         }
        Box(
            modifier = Modifier
-               .fillMaxSize(),
-           contentAlignment = Alignment.BottomCenter
+               .fillMaxSize()
+               .padding(15.dp),
+           contentAlignment = Alignment.TopEnd
        ){
-
+           IconButton(
+               onClick = { showMenu.value=!showMenu.value}
+           ) {
+               Icon(
+                   imageVector = Icons.Default.MoreVert,
+                   contentDescription = "menu icon",
+                   tint=Color.White
+               )
+           }
        }
     }
     BackHandler() {
@@ -115,7 +133,7 @@ fun mainContent(navController: NavHostController,
     var barcodeValue2 = remember { mutableStateOf("") }
     Column(
         modifier = Modifier
-            .padding(top = 50.dp, bottom = 20.dp, start = 35.dp, end = 35.dp),
+            .padding(top = 50.dp, bottom = 50.dp, start = 35.dp, end = 35.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -160,27 +178,7 @@ fun mainContent(navController: NavHostController,
         ) {
             button(btnName = "Extra Points", navController, showReminder,currentCampName)
         }
-        Row(
-            modifier = Modifier
-                .weight(0.5f)
-                .clickable {
-                           logout(
-                               shutDownError = shutDownError,
-                               errorMessage= errorMessage,
-                               navController= navController
-                           )
-                },
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(
-                Icons.Default.Logout,
-                contentDescription = null,
-                tint = colorResource(id = R.color.mainColor))
-            Text(
-                text=" Logout"
-            )
-        }
+
     }
 }
 
@@ -211,7 +209,6 @@ fun headerSection(
                         painterResource(R.drawable.profile_photo),
                         modifier = Modifier
                             .size(50.dp)
-                            .padding(3.dp)
                             .aspectRatio(1f),
                         contentDescription = "",
                     )
@@ -470,12 +467,12 @@ fun validation(
                                     .size(90.dp)
 
                             )
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "Are You Sure?",
                                     modifier = Modifier,
-                                    fontSize = 25.sp,
+                                    fontSize = 23.sp,
                                     fontFamily = FontFamily(Font(R.font.bold2))
                                 )
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -494,7 +491,7 @@ fun validation(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
@@ -563,14 +560,14 @@ fun validId(navController:NavHostController){
                     navController.navigate(ScreensRoute.AttendanceScreen.route)
                 }
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "Success!",
             modifier = Modifier.weight(1f),
-            fontSize = 25.sp,
+            fontSize = 23.sp,
             fontFamily = FontFamily(Font(R.font.bold2))
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = "Trainee has been added to attendance",
             modifier = Modifier.weight(1f)
@@ -587,7 +584,7 @@ fun invalidId(message:MutableState<String>){
         Text(
             text = "Failed",
             modifier = Modifier.padding(5.dp),
-            fontSize = 25.sp,
+            fontSize = 23.sp,
             fontFamily = FontFamily(Font(R.font.bold2))
         )
         Icon(
@@ -597,7 +594,7 @@ fun invalidId(message:MutableState<String>){
         )
 
     }
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(modifier = Modifier.height(12.dp))
     Text(
         text = message.value,
         modifier = Modifier
@@ -742,5 +739,88 @@ fun campSelectionReminder(
         }
     }
 }
+@Composable
+fun menuItems(
+    navController: NavHostController,
+    showMenu: MutableState<Boolean>,
+    errorMessage: MutableState<String>,
+    shutDownError: MutableState<Boolean>
+) {
 
+    val mode=remember{ mutableStateOf("")}
+    val context= LocalContext.current
+    mode.value= getMode().toString()
+
+    if (showMenu.value) {
+        Box() {
+            DropdownMenu(
+                expanded = showMenu.value,
+                onDismissRequest = { showMenu.value = false },
+                offset = DpOffset(x = (200).dp, y = (5).dp)
+            )
+            {
+                DropdownMenuItem(
+                    onClick = {
+
+                        logout(
+                            shutDownError=shutDownError,
+                            errorMessage=errorMessage,
+                            navController=navController
+                        )
+                        showMenu.value = false
+                    }
+                ) {
+                    Row() {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = null,
+                            tint = colorResource(id = R.color.mainColor)
+                        )
+                        Text(
+                            text = "Logout",
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+                DropdownMenuItem(
+                    onClick = {
+
+                        when(mode.value){
+                            "Dark Mode"->{
+                                MainActivity.mode_sharedPref.edit().putString(MainActivity.MODE,"Light Mode").apply()
+                                refresh(context)
+                            }
+                            "Light Mode"->{
+                                MainActivity.mode_sharedPref.edit().putString(MainActivity.MODE,"Dark Mode").apply()
+                                refresh(context)
+                            }
+                        }
+                        showMenu.value = false
+                    }
+                ) {
+                    Row() {
+                        when(mode.value){
+                            "Dark Mode"->{
+                                Icon(
+                                    imageVector = Icons.Default.DarkMode,
+                                    contentDescription = null,
+                                )
+                            }
+                            "Light Mode"->{
+                                Icon(
+                                    imageVector = Icons.Default.LightMode,
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                        Text(
+                            text = mode.value,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 

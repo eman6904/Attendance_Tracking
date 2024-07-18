@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -145,7 +146,11 @@ fun search(searchedTrainee:MutableState<String>,traineeId:MutableState<String>){
             .padding(start = 15.dp, end = 15.dp),
         shape= RoundedCornerShape(10.dp,10.dp,10.dp,10.dp),
         colors=SearchBarDefaults.colors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colors.surface,
+            inputFieldColors = androidx.compose.material3.TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colors.onSurface,
+                unfocusedTextColor = MaterialTheme.colors.onSurface
+            )
         ),
         query=searchedTrainee.value,
         onQueryChange={
@@ -158,9 +163,16 @@ fun search(searchedTrainee:MutableState<String>,traineeId:MutableState<String>){
         onActiveChange={
             active.value=it
         },
-        placeholder = {Text(text="Search Name")},
+        placeholder = {
+            Text(
+                text="Search Name",
+                color= MaterialTheme.colors.onSurface
+            )},
         leadingIcon = {
-            Icon(imageVector = Icons.Default.Search, contentDescription = "Search icon")
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search icon",
+                tint = MaterialTheme.colors.onSurface)
         },
         trailingIcon = {
 
@@ -175,6 +187,7 @@ fun search(searchedTrainee:MutableState<String>,traineeId:MutableState<String>){
                             active.value=false
                     },
                     imageVector = Icons.Default.Close,
+                    tint = MaterialTheme.colors.onSurface,
                     contentDescription = "Close icon")
             }
         }
@@ -249,7 +262,6 @@ fun selectPointAction(
                         .fillMaxWidth()
                         .padding(10.dp)
                         .weight(8f),
-                    color = Color.Gray,
                     fontFamily = FontFamily.Default,
                     fontSize = 15.sp
                 )
@@ -257,7 +269,6 @@ fun selectPointAction(
                     modifier = Modifier.weight(1f),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             }
         }
@@ -293,7 +304,7 @@ fun selectPointAction(
                                 tint = Color.Red
                             )
                         }
-                        Text(text = it, fontSize = 20.sp, color = Color.DarkGray)
+                        Text(text = it, fontSize = 20.sp)
                     }
                 }
             }
@@ -310,15 +321,19 @@ fun pointsField(points: MutableState<String>) {
             .fillMaxWidth()
             .padding(start = 15.dp, end = 15.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+        backgroundColor = MaterialTheme.colors.surface,
         elevation = 3.dp,
     ) {
         TextField(
             modifier = Modifier,
             value = points.value,
             onValueChange = { points.value = it },
-            placeholder = { Text(text="Points") },
+            placeholder = { Text(
+                text="Points",
+                color= MaterialTheme.colors.onSurface,
+            ) },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor = MaterialTheme.colors.surface,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = colorResource(id = R.color.mainColor),
@@ -424,7 +439,10 @@ fun ColumnItem(active:MutableState<Boolean>, trainee:ItemData,
                 active.value = false
             }
             .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 10.dp)
+            .padding(top = 10.dp, bottom = 10.dp),
+        style = TextStyle(
+            color = MaterialTheme.colors.onSurface
+        )
     )
 
     Divider(modifier = Modifier

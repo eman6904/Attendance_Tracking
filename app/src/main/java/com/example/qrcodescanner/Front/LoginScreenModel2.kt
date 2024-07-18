@@ -1,8 +1,6 @@
 package com.example.qrcodescanner.Front
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +45,7 @@ fun login2(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
        val  errorMessage= remember { mutableStateOf("")}
        val  shutDownError= remember { mutableStateOf(false)}
@@ -94,13 +93,24 @@ fun headerSection() {
                 shape = RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp),
 
                 ) {
-                Image(
-                    painterResource(R.drawable.icpc_yellow_logo),
-                    modifier = Modifier
-                        .size(80.dp)
-                        .aspectRatio(1f),
-                    contentDescription = "",
-                )
+                if(getMode().toString()=="Dark Mode"||getMode()==null){
+                    Image(
+                        painterResource(R.drawable.icpc_logo_light),
+                        modifier = Modifier
+                            .size(80.dp)
+                            .aspectRatio(1f),
+                        contentDescription = "",
+                    )
+
+                }else{
+                    Image(
+                        painterResource(R.drawable.icpc_logo_night),
+                        modifier = Modifier
+                            .size(80.dp)
+                            .aspectRatio(1f),
+                        contentDescription = "",
+                    )
+                }
             }
         }
         Column(
@@ -109,13 +119,17 @@ fun headerSection() {
                 .fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(10.dp))
-            Text("ISc System", color = Color.White, fontSize = 15.sp)
             Text(
-                "Attendance registration", color = Color.White,
+                text="ISc System",
+                fontSize = 15.sp,
+                color=Color.White,
+            )
+            Text(
+                "Attendance registration",
+                color=Color.White,
                 fontSize = 20.sp,
                 fontFamily = FontFamily(Font(R.font.bold2)),
             )
-            //   Text("ICPC sohag Community Trainings",color=Color.White, fontSize = 15.sp)
         }
     }
 }
@@ -145,7 +159,7 @@ fun mainContent2(
 
     val showProgress = remember { mutableStateOf(false) }
 
-    if(rememberMe=="true"&& getLoginData() !=null){
+    if(rememberMe.toString()=="true"&& getLoginData() !=null){
 
         userName.value= getLoginData()!!.userName
         password.value= getLoginData()!!.password
@@ -265,6 +279,8 @@ fun mainContent2(
               ) {
                   ClickableText(
                       text = AnnotatedString("Forgot Your Password?"),
+                      style = TextStyle(
+                          color = MaterialTheme.colors.onSurface),
                       onClick =
                       {
                           navController.navigate(ScreensRoute.ForgetPasswordScreen.route)
@@ -284,6 +300,7 @@ fun passwordField2(password: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -297,7 +314,7 @@ fun passwordField2(password: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor =MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -313,9 +330,11 @@ fun passwordField2(password: MutableState<String>, modifier: Modifier) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             },
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onSurface
+            ),
             trailingIcon = {
                 val image = if (passwordVisible.value)
                     Icons.Filled.Visibility
@@ -342,6 +361,7 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
 
         TextField(
@@ -357,7 +377,7 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor =MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -365,12 +385,14 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
                 disabledTextColor = Color.Transparent
 
             ),
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onSurface
+            ),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             }
         )

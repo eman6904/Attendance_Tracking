@@ -7,6 +7,9 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.example.qrcodescanner.MainActivity.Companion.SELECTED_CAMPP
 import com.example.qrcodescanner.MainActivity.Companion.SELECTED_DATE
@@ -14,6 +17,8 @@ import com.example.qrcodescanner.MainActivity.Companion.selectedCamp_sharedPref
 import com.example.qrcodescanner.MainActivity.Companion.selectedDate_sharedPref
 import com.example.qrcodescanner.Back.APIs.ApiConnection
 import com.example.qrcodescanner.Back.functions.getCurrentDate
+import com.example.qrcodescanner.Back.functions.getMode
+import com.example.qrcodescanner.ui.theme.ICPCTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -25,29 +30,54 @@ class MainActivity : ComponentActivity() {
         val SELECTED_DATE = "Locale.Helper.Selected.Date"
         val REMEMBER_ME = "Locale.Helper.Selected.Remember"
         val LOGIN_REQUIREMENTS = "Locale.Helper.Selected.Login"
+        val MODE = "Locale.Helper.Selected.Mode"
         // Initialize SharedPreferences
         lateinit var selectedCamp_sharedPref: SharedPreferences
         lateinit var selectedUser_sharedPref: SharedPreferences
         lateinit var selectedDate_sharedPref: SharedPreferences
         lateinit var rememberMe_sharedPref: SharedPreferences
         lateinit var userData_sharedPref: SharedPreferences
+        lateinit var mode_sharedPref: SharedPreferences
         val connect=ApiConnection()
         lateinit var token:String
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-       setContent {
-           selectedCamp_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-           selectedUser_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-           selectedDate_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-           rememberMe_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-           userData_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        selectedCamp_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        selectedUser_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        selectedDate_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        rememberMe_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        userData_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        mode_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
 
-           updateDate()
-           val navController= rememberNavController()
-           appNavGraph(navController = navController)
-          // login2(navController = navController)
+       setContent {
+
+           val darkTheme=remember{ mutableStateOf(false)}
+           if(getMode()==null) {
+               darkTheme.value = isSystemInDarkTheme()
+               if(darkTheme.value){
+                   mode_sharedPref.edit().putString(MODE,"Light Mode").apply()
+               }else{
+                   mode_sharedPref.edit().putString(MODE,"Dark Mode").apply()
+               }
+           }
+           else{
+               when(getMode()){
+                   "Dark Mode"->{
+                       darkTheme.value=false
+                   }
+                   "Light Mode"->{
+                       darkTheme.value=true
+                   }
+               }
+           }
+           ICPCTheme(darkTheme = darkTheme.value) {
+               updateDate()
+               val navController= rememberNavController()
+               appNavGraph(navController = navController)
+               // login2(navController = navController)
+           }
      }
  }
 }

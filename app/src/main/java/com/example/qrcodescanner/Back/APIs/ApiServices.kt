@@ -23,7 +23,12 @@ interface ApiServices {
 
 
     @GET("Mobile/getPresentTrainees")
-    fun getPresentTrainees(@Query("campId") campId: Int,@Query("currentDate")currentDate:String): Call<ApiResponse>
+    fun getPresentTrainees(
+        @Query("campId") campId: Int,
+        @Query("currentDate")currentDate:String,
+        @Query("keyWord")keyWord:String,
+        @Header("Authorization") token: String
+    ): Call<ApiResponse>
 
 
     @PUT("Mobile/updateTraineePoints")

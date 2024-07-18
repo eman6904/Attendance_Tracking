@@ -1,7 +1,7 @@
 package com.example.qrcodescanner.Front
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -49,97 +48,105 @@ fun OTPCode(navController: NavHostController, email: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp, start = 20.dp, end = 20.dp)
-
+            .background(MaterialTheme.colors.surface)
     ) {
-       errorDialog(
-           shutDown = shutDownError,
-           errorMessage = errorMessage
-       )
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.5f),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+                .background(MaterialTheme.colors.surface)
+
         ) {
+            errorDialog(
+                shutDown = shutDownError,
+                errorMessage = errorMessage
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        tint = colorResource(id = R.color.mainColor),
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            navController.popBackStack()
+                        }
+                    )
+                    Image(
+                        painterResource(R.drawable.otp),
+                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = "",
+                    )
+                }
+            }
             Column(
-
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.7f),
             ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    tint = colorResource(id = R.color.mainColor),
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        navController.popBackStack()
-                    }
+                space(h = 15)
+                Text(
+                    text = "Enter OTP",
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily(Font(R.font.bold2)),
+                    color=MaterialTheme.colors.onSurface
                 )
-                Image(
-                    painterResource(R.drawable.otp),
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = "",
+                space(h = 15)
+                Text(
+                    text = "4 digits code has been sent to :",
+                    fontSize = 20.sp,
+                    color=MaterialTheme.colors.onSurface
+                )
+                Text(
+                    text = email,
+                    fontSize = 18.sp,
+                    color=MaterialTheme.colors.onSurface
                 )
             }
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(0.7f),
-        ) {
-            space(h = 15)
-            Text(
-                text = "Enter OTP",
-                fontSize = 25.sp,
-                fontFamily = FontFamily(Font(R.font.bold2)),
-            )
-            space(h = 15)
-            Text(
-                text = "4 digits code has been sent to :",
-                color = Color.Gray,
-                fontSize = 20.sp
-            )
-            Text(
-                text = email,
-                color = Color.Gray,
-                fontSize = 18.sp
-            )
-        }
-        space(h = 20)
-        Row(
-            //  horizontalArrangement = Arrangement.Center,
-            //  verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(0.5f)
+            space(h = 20)
+            Row(
+                //  horizontalArrangement = Arrangement.Center,
+                //  verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.5f)
 
 
-        ) {
-            val modifier = Modifier
-                .weight(1f)
-            Spacer(modifier = Modifier.width(20.dp))
-            for (i in 0..3) {
-
-                OTPDigit(modifier = modifier, digit = otpDigits[i])
+            ) {
+                val modifier = Modifier
+                    .weight(1f)
                 Spacer(modifier = Modifier.width(20.dp))
+                for (i in 0..3) {
+
+                    OTPDigit(modifier = modifier, digit = otpDigits[i])
+                    Spacer(modifier = Modifier.width(20.dp))
+                }
+
             }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-            ) {
-            space(h = 25)
-            confirmButton(
-                otpDigits,
-                email,
-                showProgress,
-                navController,
-                shutDownError,
-                errorMessage
-            )
-            progressBar(show = showProgress)
+                ) {
+                space(h = 25)
+                confirmButton(
+                    otpDigits,
+                    email,
+                    showProgress,
+                    navController,
+                    shutDownError,
+                    errorMessage
+                )
+                progressBar(show = showProgress)
+            }
         }
     }
 }
@@ -194,7 +201,8 @@ fun confirmButton(
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.mainColor)
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .padding(start=10.dp,end=10.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
     ) {
 
@@ -216,6 +224,7 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
 
         Box(
@@ -223,19 +232,22 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
             modifier = Modifier.fillMaxSize()
         ) {
             TextField(
-                modifier = Modifier.fillMaxWidth(),
                 value = digit.value,
                 onValueChange = { digit.value = it },
                 placeholder = {
-                    Text(
-                        text = " * ",
-                        textAlign = TextAlign.Center, // Center the placeholder text
-                        fontSize = 25.sp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ){
+                        Text(
+                            text = " * ",
+                            textAlign = TextAlign.Center, // Center the placeholder text
+                            fontSize = 25.sp,
+                        )
+                    }
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
+                    backgroundColor =MaterialTheme.colors.secondary,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     cursorColor = Color.Gray,
@@ -245,7 +257,7 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
                 textStyle = LocalTextStyle.current.copy(
                     textAlign = TextAlign.Center,
                     fontSize = 25.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colors.onSurface
                 ), // Center the input text
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )

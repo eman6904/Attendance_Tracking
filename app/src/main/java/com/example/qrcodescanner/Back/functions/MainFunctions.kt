@@ -1,5 +1,7 @@
 package com.example.qrcodescanner.Back.functions
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +28,9 @@ import com.example.qrcodescanner.ScreensRoute
 import com.example.qrcodescanner.Back.DataClasses.*
 import com.example.qrcodescanner.Front.space
 import com.example.qrcodescanner.MainActivity.Companion.LOGIN_REQUIREMENTS
+import com.example.qrcodescanner.MainActivity.Companion.MODE
+import com.example.qrcodescanner.MainActivity.Companion.REMEMBER_ME
+import com.example.qrcodescanner.MainActivity.Companion.rememberMe_sharedPref
 import com.example.qrcodescanner.MainActivity.Companion.userData_sharedPref
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +54,7 @@ fun getAllTrainees(
     GlobalScope.launch(Dispatchers.IO) {
 
         try {
-            connect.connect().getTraineesByCampId(campId!!, token)
+            connect.connect().getTraineesByCampId(campId!!, "Bearer $token")
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(
                         call: Call<ApiResponse>,
@@ -78,7 +83,7 @@ fun getAllTrainees(
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -99,6 +104,7 @@ fun getPresentTrainees(
     showProgress: MutableState<Boolean>,
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
+    selectedTrainee:MutableState<String>
 ) {
 
     val campId = getCurrentCamp()?.id?.toInt()
@@ -107,7 +113,7 @@ fun getPresentTrainees(
 
     GlobalScope.launch(Dispatchers.IO) {
         try {
-            connect.connect().getPresentTrainees(campId!!, currentDate)
+            connect.connect().getPresentTrainees(campId!!, currentDate,selectedTrainee.value,"Bearer $token")
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(
                         call: Call<ApiResponse>,
@@ -119,7 +125,7 @@ fun getPresentTrainees(
                         showProgress.value = true
 
                         if (response.isSuccessful) {
-                            Log.d("response", "${response.body()}")
+                           // Log.d("response", "${response.body()}")
                             if (response.body()!!.message == "No current session for now.")
                                 itemsCase.value = "No current session for now."
                             else {
@@ -147,7 +153,7 @@ fun getPresentTrainees(
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                         showProgress.value = false
                     }
                 })
@@ -169,7 +175,8 @@ fun getCamps(
 ) {
     GlobalScope.launch(Dispatchers.IO) {
         try {
-            connect.connect().getAllCamps(token).enqueue(object : Callback<ApiResponse> {
+
+            connect.connect().getAllCamps("Bearer $token").enqueue(object : Callback<ApiResponse> {
                 override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
 
                     camps.clear()
@@ -195,7 +202,7 @@ fun getCamps(
 
 
                     shutDownError.value = true
-                    errorMessage.value = "Network error: " + t.message.toString()
+                    errorMessage.value = "Network error: " +"Please check your internet connection"
                     showProgress.value = false
                 }
             })
@@ -219,7 +226,7 @@ fun addTraineeToAttendance(
 ) {
     GlobalScope.launch(Dispatchers.IO) {
         try {
-            connect.connect().addTraineeToAttendance(traineeRequirements, token)
+            connect.connect().addTraineeToAttendance(traineeRequirements, "Bearer $token")
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(
                         call: Call<ApiResponse>,
@@ -261,7 +268,7 @@ fun traineePointsUpdate(extraPoint: ExtraPointRequirements,
                         errorMessage: MutableState<String>,) {
     GlobalScope.launch(Dispatchers.IO) {
         try {
-            connect.connect().traineePointsUpdate(extraPoint, token)
+            connect.connect().traineePointsUpdate(extraPoint, "Bearer $token")
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(
                         call: Call<ApiResponse>,
@@ -284,7 +291,7 @@ fun traineePointsUpdate(extraPoint: ExtraPointRequirements,
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                     }
 
                 })
@@ -344,7 +351,7 @@ fun forgotPassword(email: String,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                         showProgress.value=false
                     }
 
@@ -412,7 +419,7 @@ fun checkOtp(email: String,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -474,7 +481,7 @@ fun resetPassword( resetRequirements: PasswordResetRequirements,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value = "Network error: " +"Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -511,6 +518,7 @@ fun login(
                         val result = loginResponse!!.message
 
                         if (result == "Success") {
+                           // Log.d("responsee","${response.body()}")
                             val json2 = gson.toJson(loginResponse.data)
                             MainActivity.selectedUser_sharedPref.edit()
                                 .putString(MainActivity.SELECTED_USER, json2).apply()
@@ -542,7 +550,7 @@ fun login(
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
 
                     shutDownError.value = true
-                    errorMessage.value = "Network error: " + t.message.toString()
+                    errorMessage.value = "Network error: " +"Please check your internet connection"
                     showProgress.value = false
                 }
             })
@@ -565,29 +573,6 @@ fun getCurrentUser(): UserData? {
     return currentUser
 }
 
-fun getCurrentCamp(): ItemData? {
-
-    val gson = Gson()
-    val json = MainActivity.selectedCamp_sharedPref.getString(MainActivity.SELECTED_CAMPP, null)
-    val savedCamp = json?.let { gson.fromJson(it, ItemData::class.java) }
-
-    return savedCamp
-}
-fun getLoginData(): LoginRequirements? {
-
-    val gson = Gson()
-    val json = MainActivity.userData_sharedPref.getString(MainActivity.LOGIN_REQUIREMENTS, null)
-    val savedData = json?.let { gson.fromJson(it, LoginRequirements::class.java) }
-
-    return savedData
-}
-
-fun getCurrentDate(): String {
-    val sdf = SimpleDateFormat("dd-MM-yyyy")
-    var currentDate = sdf.format(Date())
-
-    return currentDate
-}
 @Composable
 fun errorDialog(
     shutDown:MutableState<Boolean>,
@@ -651,7 +636,7 @@ fun logout(
     navController: NavHostController,
 ) {
         try {
-
+            rememberMe_sharedPref.edit().putString(REMEMBER_ME,null).apply()
             navController.navigate(ScreensRoute.LogInScreen.route) {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = true
@@ -662,6 +647,39 @@ fun logout(
             shutDownError.value = true
             errorMessage.value = "Unexpected error: " + e.message.toString()
         }
+}
+fun getCurrentCamp(): ItemData? {
+
+    val gson = Gson()
+    val json = MainActivity.selectedCamp_sharedPref.getString(MainActivity.SELECTED_CAMPP, null)
+    val savedCamp = json?.let { gson.fromJson(it, ItemData::class.java) }
+
+    return savedCamp
+}
+fun getLoginData(): LoginRequirements? {
+
+    val gson = Gson()
+    val json = MainActivity.userData_sharedPref.getString(MainActivity.LOGIN_REQUIREMENTS, null)
+    val savedData = json?.let { gson.fromJson(it, LoginRequirements::class.java) }
+
+    return savedData
+}
+
+fun getCurrentDate(): String {
+    val sdf = SimpleDateFormat("dd-MM-yyyy")
+    var currentDate = sdf.format(Date())
+
+    return currentDate
+}
+fun getMode():String?{
+
+   return MainActivity.mode_sharedPref.getString(MainActivity.MODE,null)
+}
+fun refresh(context:Context){
+
+    val refreshIntent = Intent(context, MainActivity::class.java)
+    refreshIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+    context.startActivity(refreshIntent)
 }
 
 //كنت مستخدمة live data ولكن تراجعت عن ذلك لسوء التعامل معها حيث يحدث تاخر ف عمليه data observation

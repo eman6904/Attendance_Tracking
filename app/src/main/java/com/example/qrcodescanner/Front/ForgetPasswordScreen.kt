@@ -1,6 +1,7 @@
 package com.example.qrcodescanner.Front
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,105 +47,113 @@ fun forgetPassword(navController: NavHostController) {
         .border(2.dp, Color.Red, RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
     val modifierForNotEmptyField = Modifier
         .fillMaxWidth()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp, start = 20.dp, end = 20.dp)
-
-    ) {
-        errorDialog(
-            shutDown = shutDownError,
-            errorMessage = errorMessage
-        )
-
-           Icon(
-               imageVector = Icons.Default.ArrowBack,
-               tint = colorResource(id = R.color.mainColor),
-               contentDescription = null,
-               modifier = Modifier.clickable {
-                   navController.popBackStack()
-               }
-           )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painterResource(R.drawable.forget_icon2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(25.dp),
-                contentDescription = "",
-            )
-
-        }
+            .background(MaterialTheme.colors.surface)
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
+                .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+                .background(MaterialTheme.colors.surface)
 
         ) {
+            errorDialog(
+                shutDown = shutDownError,
+                errorMessage = errorMessage
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                tint = colorResource(id = R.color.mainColor),
+                contentDescription = null,
+                modifier = Modifier.clickable {
+                    navController.popBackStack()
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painterResource(R.drawable.forget_icon2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(25.dp),
+                    contentDescription = "",
+                )
+
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(2.3f)
-            ) {
-                Text(
-                    text = "Forgot",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.bold2)),
-                )
-                Text(
-                    text = "Password?",
-                    fontSize = 25.sp,
-                    fontFamily = FontFamily(Font(R.font.bold2)),
-                )
-                space(h = 15)
-                Text(
-                    text = "Don't worry it happens.Please enter email " +
-                            "address associated with your account.",
-                    color = Color.Gray,
-                    fontSize = 15.sp
-                )
-            }
-            space(h = 10)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-            ) {
-                if (emptyMail.value == false || email.value.isNotEmpty())
-                    emailField(email, modifierForNotEmptyField)
-                else
-                    emailField(email, modifierForEmptyField)
-            }
-            space(h = 10)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(2.5f),
-            ) {
+                    .weight(1f)
 
-                Column() {
-                    space(h = 15)
-                    sendButton(
-                        email=email,
-                        emptyEmail=emptyMail,
-                        navController,
-                        showProgress,
-                        shutDownError,
-                        errorMessage
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(2.3f)
+                ) {
+                    Text(
+                        text = "Forgot",
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.bold2)),
+                        color=MaterialTheme.colors.onSurface
                     )
-
-                    progressBar(show = showProgress)
+                    Text(
+                        text = "Password?",
+                        fontSize = 25.sp,
+                        fontFamily = FontFamily(Font(R.font.bold2)),
+                        color=MaterialTheme.colors.onSurface
+                    )
+                    space(h = 15)
+                    Text(
+                        text = "Don't worry it happens.Please enter email " +
+                                "address associated with your account.",
+                        color=MaterialTheme.colors.onSurface,
+                        fontSize = 15.sp
+                    )
                 }
+                space(h = 10)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                ) {
+                    if (emptyMail.value == false || email.value.isNotEmpty())
+                        emailField(email, modifierForNotEmptyField)
+                    else
+                        emailField(email, modifierForEmptyField)
+                }
+                space(h = 10)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(2.5f),
+                ) {
+
+                    Column() {
+                        space(h = 15)
+                        sendButton(
+                            email=email,
+                            emptyEmail=emptyMail,
+                            navController,
+                            showProgress,
+                            shutDownError,
+                            errorMessage
+                        )
+
+                        progressBar(show = showProgress)
+                    }
+                }
+
             }
 
         }
-
     }
 }
 
@@ -155,6 +164,7 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
 
         TextField(
@@ -170,7 +180,7 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor =MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -178,12 +188,14 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
                 disabledTextColor = Color.Transparent
 
             ),
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onSurface
+            ),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Email,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             }
         )

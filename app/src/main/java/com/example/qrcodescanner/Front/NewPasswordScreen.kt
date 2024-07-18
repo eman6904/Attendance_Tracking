@@ -2,6 +2,7 @@ package com.example.qrcodescanner.Front
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -66,119 +67,127 @@ fun newPassword(
         .fillMaxWidth()
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+   Column(
+       modifier = Modifier
+           .fillMaxSize()
+           .background(MaterialTheme.colors.surface)
+   ) {
+       Column(
+           modifier = Modifier
+               .fillMaxSize()
+               .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+               .background(MaterialTheme.colors.surface)
 
-    ) {
-        errorDialog(
-            shutDown = shutDownError,
-            errorMessage = errorMessage
-        )
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            tint = colorResource(id = R.color.mainColor),
-            contentDescription = null,
-            modifier = Modifier.clickable {
-                navController.popBackStack()
-            }
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(3f),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painterResource(R.drawable.resetpassword),
-                modifier = Modifier.fillMaxSize(),
-                contentDescription = "",
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-        ) {
-            Text(
-                text = "Reset",
-                fontSize = 20.sp,
-                fontFamily = FontFamily(Font(R.font.bold2)),
-            )
-            Text(
-                text = "Password",
-                fontSize = 25.sp,
-                fontFamily = FontFamily(Font(R.font.bold2)),
-            )
-        }
-        Box(
-            modifier= Modifier
-                .weight(1f)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            if (emptyPassword.value == false || password.value.isNotEmpty())
-                newPasswordField(password, modifierForNotEmptyField)
-            else
-                newPasswordField(password, modifierForEmptyField)
-        }
-        space(15)
-        Box(
-            modifier= Modifier
-                .weight(1f)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            if (emptyConfirmPassword.value == false || confirmPassword.value.isNotEmpty()){
+       ) {
+           errorDialog(
+               shutDown = shutDownError,
+               errorMessage = errorMessage
+           )
+           Icon(
+               imageVector = Icons.Default.ArrowBack,
+               tint = colorResource(id = R.color.mainColor),
+               contentDescription = null,
+               modifier = Modifier.clickable {
+                   navController.popBackStack()
+               }
+           )
+           Box(
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .weight(3f),
+               contentAlignment = Alignment.Center
+           ) {
+               Image(
+                   painterResource(R.drawable.resetpassword),
+                   modifier = Modifier.fillMaxSize(),
+                   contentDescription = "",
+               )
+           }
+           Column(
+               modifier = Modifier
+                   .fillMaxSize()
+                   .weight(1f)
+           ) {
+               Text(
+                   text = "Reset",
+                   fontSize = 20.sp,
+                   fontFamily = FontFamily(Font(R.font.bold2)),
+                   color=MaterialTheme.colors.onSurface
+               )
+               Text(
+                   text = "Password",
+                   fontSize = 25.sp,
+                   fontFamily = FontFamily(Font(R.font.bold2)),
+                   color=MaterialTheme.colors.onSurface
+               )
+           }
+           Box(
+               modifier= Modifier
+                   .weight(1f)
+                   .fillMaxSize(),
+               contentAlignment = Alignment.Center
+           ){
+               if (emptyPassword.value == false || password.value.isNotEmpty())
+                   newPasswordField(password, modifierForNotEmptyField)
+               else
+                   newPasswordField(password, modifierForEmptyField)
+           }
+           space(15)
+           Box(
+               modifier= Modifier
+                   .weight(1.5f)
+                   .fillMaxSize(),
+               contentAlignment = Alignment.Center
+           ){
+               if (emptyConfirmPassword.value == false || confirmPassword.value.isNotEmpty()){
 
-                Column(){
-                    conFirmPasswordField(confirmPassword, modifierForNotEmptyField)
-                    if(notSame.value)
-                    Text(
-                        text="Doesn't match with password",
-                        color=Color.Red,
-                        modifier = Modifier
-                            .padding(top = 5.dp)
-                            .fillMaxWidth()
-                    )
-                }
-            }
-            else
-                conFirmPasswordField(confirmPassword, modifierForEmptyField)
-        }
-        space(15)
-        Box(
-            modifier= Modifier
-                .weight(2f)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column() {
-                resetButton(
-                    password,
-                    confirmPassword,
-                    emptyPassword,
-                    emptyConfirmPassword,
-                    showProgress,
-                    notSame,
-                    email,
-                    token,
-                    navController,
-                    shutDownError,
-                    errorMessage
-                )
+                   Column(){
+                       conFirmPasswordField(confirmPassword, modifierForNotEmptyField)
+                       if(notSame.value)
+                           Text(
+                               text="Doesn't match with password",
+                               color=Color.Red,
+                               modifier = Modifier
+                                   .padding(top = 3.dp)
+                                   .fillMaxWidth()
+                           )
+                   }
+               }
+               else
+                   conFirmPasswordField(confirmPassword, modifierForEmptyField)
+           }
+           Box(
+               modifier= Modifier
+                   .weight(2f)
+                   .fillMaxSize(),
+               contentAlignment = Alignment.Center
+           ) {
+               Column() {
+                   resetButton(
+                       password,
+                       confirmPassword,
+                       emptyPassword,
+                       emptyConfirmPassword,
+                       showProgress,
+                       notSame,
+                       email,
+                       token,
+                       navController,
+                       shutDownError,
+                       errorMessage
+                   )
 
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    space(h = 30)
-                    progressBar(show = showProgress)
-                }
-            }
-        }
-    }
+                   Box(
+                       modifier = Modifier.fillMaxSize(),
+                       contentAlignment = Alignment.Center
+                   ) {
+                       space(h = 30)
+                       progressBar(show = showProgress)
+                   }
+               }
+           }
+       }
+   }
 }
 @Composable
 fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
@@ -188,6 +197,7 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -200,8 +210,11 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
                     Text(text = "Password")
                 }
             },
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onSurface
+            ),
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor =MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -217,7 +230,6 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             },
             trailingIcon = {
@@ -242,9 +254,10 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
 fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
 
     Card(
-        modifier = modifier.padding(bottom = 5.dp),
+        modifier = modifier.padding(bottom = 10.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
+        backgroundColor =MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -258,7 +271,7 @@ fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
+                backgroundColor =MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -266,12 +279,14 @@ fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
                 disabledTextColor = Color.Transparent
 
             ),
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onSurface
+            ),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = Color.DarkGray
                 )
             },
         )
