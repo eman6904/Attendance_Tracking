@@ -1,5 +1,6 @@
 package com.example.qrcodescanner
 
+import QrScannerScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ fun appNavGraph(navController: NavHostController) {
         composable(route = ScreensRoute.ExtraPointScreen.route) { extraPoints(navController) }
         composable(route = ScreensRoute.MainScreen.route) { mainScreen(navController) }
         composable(route = ScreensRoute.AttendanceScreen.route) { attendanceList(navController) }
+        composable(route = ScreensRoute.ScannerScreen.route) { QrScannerScreen(navController) }
         composable(route = ScreensRoute.NewPasswordScreen.route+"/{email}"+"/{token}") {
             val email=it.arguments?.getString("email")
             val token=it.arguments?.getString("token")

@@ -43,11 +43,11 @@ import com.example.qrcodescanner.Back.functions.resetPassword
 @Composable
 fun newPassword(
     navController: NavHostController,
-    email:String,
-    token:String
+    email: String,
+    token: String
 ) {
-    Log.d("email",email)
-    Log.d("token",token)
+    Log.d("email", email)
+    Log.d("token", token)
     val confirmPassword = rememberSaveable() { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     var emptyPassword = rememberSaveable() { mutableStateOf(false) }
@@ -56,8 +56,8 @@ fun newPassword(
     var notEmptyConfirmPass = rememberSaveable() { mutableStateOf(false) }
     var showProgress = rememberSaveable() { mutableStateOf(false) }
     var notSame = rememberSaveable() { mutableStateOf(false) }
-    val  errorMessage= remember { mutableStateOf("")}
-    val  shutDownError= remember { mutableStateOf(false)}
+    val errorMessage = remember { mutableStateOf("") }
+    val shutDownError = remember { mutableStateOf(false) }
 
 
     val modifierForEmptyField = Modifier
@@ -67,128 +67,128 @@ fun newPassword(
         .fillMaxWidth()
 
 
-   Column(
-       modifier = Modifier
-           .fillMaxSize()
-           .background(MaterialTheme.colors.surface)
-   ) {
-       Column(
-           modifier = Modifier
-               .fillMaxSize()
-               .padding(top = 10.dp, start = 20.dp, end = 20.dp)
-               .background(MaterialTheme.colors.surface)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp, start = 20.dp, end = 20.dp)
+                .background(MaterialTheme.colors.surface)
 
-       ) {
-           errorDialog(
-               shutDown = shutDownError,
-               errorMessage = errorMessage
-           )
-           Icon(
-               imageVector = Icons.Default.ArrowBack,
-               tint = colorResource(id = R.color.mainColor),
-               contentDescription = null,
-               modifier = Modifier.clickable {
-                   navController.popBackStack()
-               }
-           )
-           Box(
-               modifier = Modifier
-                   .fillMaxWidth()
-                   .weight(3f),
-               contentAlignment = Alignment.Center
-           ) {
-               Image(
-                   painterResource(R.drawable.resetpassword),
-                   modifier = Modifier.fillMaxSize(),
-                   contentDescription = "",
-               )
-           }
-           Column(
-               modifier = Modifier
-                   .fillMaxSize()
-                   .weight(1f)
-           ) {
-               Text(
-                   text = "Reset",
-                   fontSize = 20.sp,
-                   fontFamily = FontFamily(Font(R.font.bold2)),
-                   color=MaterialTheme.colors.onSurface
-               )
-               Text(
-                   text = "Password",
-                   fontSize = 25.sp,
-                   fontFamily = FontFamily(Font(R.font.bold2)),
-                   color=MaterialTheme.colors.onSurface
-               )
-           }
-           Box(
-               modifier= Modifier
-                   .weight(1f)
-                   .fillMaxSize(),
-               contentAlignment = Alignment.Center
-           ){
-               if (emptyPassword.value == false || password.value.isNotEmpty())
-                   newPasswordField(password, modifierForNotEmptyField)
-               else
-                   newPasswordField(password, modifierForEmptyField)
-           }
-           space(15)
-           Box(
-               modifier= Modifier
-                   .weight(1.5f)
-                   .fillMaxSize(),
-               contentAlignment = Alignment.Center
-           ){
-               if (emptyConfirmPassword.value == false || confirmPassword.value.isNotEmpty()){
+        ) {
+            errorDialog(
+                shutDown = shutDownError,
+                errorMessage = errorMessage
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                tint = colorResource(id = R.color.mainColor),
+                contentDescription = null,
+                modifier = Modifier.clickable {
+                    navController.popBackStack()
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3f),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painterResource(R.drawable.resetpassword),
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = "",
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = "Reset",
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.bold2)),
+                    color = MaterialTheme.colors.onSurface
+                )
+                Text(
+                    text = "Password",
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily(Font(R.font.bold2)),
+                    color = MaterialTheme.colors.onSurface
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (emptyPassword.value == false || password.value.isNotEmpty())
+                    newPasswordField(password, modifierForNotEmptyField)
+                else
+                    newPasswordField(password, modifierForEmptyField)
+            }
+            space(15)
+            Box(
+                modifier = Modifier
+                    .weight(1.5f)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (emptyConfirmPassword.value == false || confirmPassword.value.isNotEmpty()) {
 
-                   Column(){
-                       conFirmPasswordField(confirmPassword, modifierForNotEmptyField)
-                       if(notSame.value)
-                           Text(
-                               text="Doesn't match with password",
-                               color=Color.Red,
-                               modifier = Modifier
-                                   .padding(top = 3.dp)
-                                   .fillMaxWidth()
-                           )
-                   }
-               }
-               else
-                   conFirmPasswordField(confirmPassword, modifierForEmptyField)
-           }
-           Box(
-               modifier= Modifier
-                   .weight(2f)
-                   .fillMaxSize(),
-               contentAlignment = Alignment.Center
-           ) {
-               Column() {
-                   resetButton(
-                       password,
-                       confirmPassword,
-                       emptyPassword,
-                       emptyConfirmPassword,
-                       showProgress,
-                       notSame,
-                       email,
-                       token,
-                       navController,
-                       shutDownError,
-                       errorMessage
-                   )
+                    Column() {
+                        conFirmPasswordField(confirmPassword, modifierForNotEmptyField)
+                        if (notSame.value)
+                            Text(
+                                text = "Doesn't match with password",
+                                color = Color.Red,
+                                modifier = Modifier
+                                    .padding(top = 3.dp)
+                                    .fillMaxWidth()
+                            )
+                    }
+                } else
+                    conFirmPasswordField(confirmPassword, modifierForEmptyField)
+            }
+            Box(
+                modifier = Modifier
+                    .weight(2f)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column() {
+                    resetButton(
+                        password,
+                        confirmPassword,
+                        emptyPassword,
+                        emptyConfirmPassword,
+                        showProgress,
+                        notSame,
+                        email,
+                        token,
+                        navController,
+                        shutDownError,
+                        errorMessage
+                    )
 
-                   Box(
-                       modifier = Modifier.fillMaxSize(),
-                       contentAlignment = Alignment.Center
-                   ) {
-                       space(h = 30)
-                       progressBar(show = showProgress)
-                   }
-               }
-           }
-       }
-   }
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        space(h = 30)
+                        progressBar(show = showProgress)
+                    }
+                }
+            }
+        }
+    }
 }
+
 @Composable
 fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
 
@@ -197,7 +197,7 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -214,7 +214,7 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
                 color = MaterialTheme.colors.onSurface
             ),
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor =MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -250,6 +250,7 @@ fun newPasswordField(password: MutableState<String>, modifier: Modifier) {
 
     }
 }
+
 @Composable
 fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
 
@@ -257,7 +258,7 @@ fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
         modifier = modifier.padding(bottom = 10.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -271,7 +272,7 @@ fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor =MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -293,77 +294,81 @@ fun conFirmPasswordField(password: MutableState<String>, modifier: Modifier) {
 
     }
 }
+
 @Composable
 fun resetButton(
     password: MutableState<String>,
-    confirmPassword:MutableState<String>,
-    emptyPassword:MutableState<Boolean>,
-    emptyConfPassword:MutableState<Boolean>,
-    showProgress:MutableState<Boolean>,
-    notSame:MutableState<Boolean>,
-    email:String,
-    token:String,
+    confirmPassword: MutableState<String>,
+    emptyPassword: MutableState<Boolean>,
+    emptyConfPassword: MutableState<Boolean>,
+    showProgress: MutableState<Boolean>,
+    notSame: MutableState<Boolean>,
+    email: String,
+    token: String,
     navController: NavHostController,
-    shutDownError:MutableState<Boolean>,
-    errorMessage:MutableState<String>
-){
-    val lifecycleOwner= LocalLifecycleOwner.current
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     val message = remember { mutableStateOf(listOf<String>()) }
-    val isSuccess= remember{ mutableStateOf(false)}
-    val shutDown= remember{ mutableStateOf(false)}
+    val isSuccess = remember { mutableStateOf(false) }
+    val shutDown = remember { mutableStateOf(false) }
 
-    if(message.value.isNotEmpty()) {
+    if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value=false
+        showProgress.value = false
     }
-    if(shutDown.value){
+    if (shutDown.value) {
 
         checkPasswordDialog(
             shutDown = shutDown,
             message = message,
             isSuccess = isSuccess,
-            navController =navController )
+            navController = navController
+        )
     }
     Button(
         onClick = {
 
-                  if(password.value.isNotEmpty()&&
-                      confirmPassword.value.isNotEmpty()&&
-                      password.value==confirmPassword.value){
+            if (password.value.isNotEmpty() &&
+                confirmPassword.value.isNotEmpty() &&
+                password.value == confirmPassword.value
+            ) {
 
-                     resetPassword(PasswordResetRequirements(
-                         password.value,
-                         token,
-                         email
-                     ),
-                         isSuccess,
-                         message,
-                        shutDownError,
-                         errorMessage,
-                         showProgress
-                     )
-                      showProgress.value=true
-                  }
-            emptyPassword.value=(password.value.isEmpty())
-            emptyConfPassword.value=(confirmPassword.value.isEmpty())
-            notSame.value=(password.value!=confirmPassword.value)
+                resetPassword(
+                    PasswordResetRequirements(
+                        password.value,
+                        token,
+                        email
+                    ),
+                    isSuccess,
+                    message,
+                    shutDownError,
+                    errorMessage,
+                    showProgress
+                )
+                showProgress.value = true
+            }
+            emptyPassword.value = (password.value.isEmpty())
+            emptyConfPassword.value = (confirmPassword.value.isEmpty())
+            notSame.value = (password.value != confirmPassword.value)
         },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.mainColor)
         ),
         modifier = Modifier
-            .fillMaxWidth()
-        , shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
+            .fillMaxWidth(), shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
     ) {
         Text(
-            text="Reset",
-            color=Color.White,
+            text = "Reset",
+            color = Color.White,
             fontSize = 20.sp,
             fontFamily = FontFamily(Font(R.font.bold2)),
             modifier = Modifier.padding(3.dp)
         )
     }
 }
+
 @Composable
 fun checkPasswordDialog(
     shutDown: MutableState<Boolean>,
@@ -375,7 +380,7 @@ fun checkPasswordDialog(
         Dialog(
             onDismissRequest = {
                 shutDown.value = false
-                message.value= listOf()
+                message.value = listOf()
             }) {
 
             Card(
@@ -393,29 +398,29 @@ fun checkPasswordDialog(
                     verticalArrangement = Arrangement.Center
                 ) {
                     space(h = 10)
-                    if(isSuccess.value){
+                    if (isSuccess.value) {
                         Text(
                             text = "Success!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
-                    }else{
+                    } else {
                         Text(
                             text = "Failed!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
                     }
                     space(h = 10)
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ){
-                        for(item in message.value){
+                    ) {
+                        for (item in message.value) {
                             Text(
                                 text = item,
                             )
@@ -426,8 +431,8 @@ fun checkPasswordDialog(
                     Button(
                         onClick = {
                             shutDown.value = false
-                            message.value= listOf()
-                            if(isSuccess.value)
+                            message.value = listOf()
+                            if (isSuccess.value)
                                 navController.navigate(ScreensRoute.MainScreen.route)
                         },
                         colors = ButtonDefaults.buttonColors(

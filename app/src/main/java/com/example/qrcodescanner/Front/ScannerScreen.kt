@@ -1,87 +1,274 @@
-package com.example.qrcodescanner.Front
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Surface
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
+import android.media.MediaPlayer
+import android.os.Build
+import android.os.Vibrator
+import android.util.Log
+import android.graphics.Rect
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Switch
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import com.example.qrcodescanner.Back.classes.BarcodeScanner
-import kotlinx.coroutines.launch
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ComponentActivity
+import androidx.navigation.NavHostController
+import com.example.qrcodescanner.Back.functions.errorDialog
+import com.example.qrcodescanner.Front.validation
+import com.example.qrcodescanner.R
+import com.example.qrcodescanner.ScreensRoute
+import com.google.common.util.concurrent.ListenableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 @Composable
-fun scannerScreen(){
+fun QrScannerScreen(navController: NavHostController) {
 
-            val context=LocalContext.current
-            var barcodeScanner= BarcodeScanner(context)
+    val barcodeValue = remember { mutableStateOf("") }
+    val errorMessage = remember { mutableStateOf("") }
+    val shutDownError = remember { mutableStateOf(false) }
+    errorDialog(shutDownError, errorMessage)
 
-           Surface(
-               modifier=Modifier.fillMaxSize()
-           ) {
-
-               val barcodeResults=barcodeScanner.barCodeResults.collectAsState()
-               scanBarcode(
-                   onScanBarcode = barcodeScanner::startScan,
-                   barcodeValue = barcodeResults.value
-               )
-           }
-}
-@Composable
-fun scanBarcode(
-    onScanBarcode:suspend()->Unit,
-    barcodeValue:String?,
-
-    ){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-
+    if (barcodeValue.value.isNotEmpty()) {
+        validation(
+            barcodeValue = barcodeValue,
+            navController = navController,
+            shutDownError = shutDownError,
+            errorMessage = errorMessage
+        )
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .border(10.dp, color = colorResource(id = R.color.mainColor))
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
     ) {
-        val scop= rememberCoroutineScope()
-        var data= rememberSaveable(){"click here"}
-        Button(
-            modifier= Modifier
+        QRCodeComposable(barcodeValue)
+        Row(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(30.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White,
-                backgroundColor = Color.Blue
-            ),
-            onClick = {
-                scop.launch {
-                    onScanBarcode()
-                }
-            }
+                .background(colorResource(id = R.color.mainColor))
+                .align(Alignment.BottomCenter)
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Image(
+                painter = painterResource(R.drawable.icpc_logo_night),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(35.dp)
+            )
             Text(
-                text = "Scan Barcode"
+                text = "ICPC Attendance",
+                style = MaterialTheme.typography.h6.copy(color = Color.White)
+            )
+            Image(
+                painter = painterResource(R.drawable.icpc_logo_night),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(35.dp)
+                    .scale(scaleX = -1f, scaleY = 1f) // Flip the image horizontally
             )
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        val localUriHandler = LocalUriHandler.current
-        if(barcodeValue!=null){
-            ClickableText(
-                text= AnnotatedString(data),
-                style = TextStyle(
-                    textDecoration = TextDecoration.Underline,
-                    color= Color.Blue
-                )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+@Composable
+fun QRCodeComposable(
+    barcodeValuee: MutableState<String>
+) {
+    val context = LocalContext.current
+    val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+        ProcessCameraProvider.getInstance(context)
+
+    DisposableEffect(cameraProviderFuture) {
+        onDispose {
+            cameraProviderFuture.get().unbindAll()
+        }
+    }
+    var hasCamPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            hasCamPermission = granted
+        }
+    )
+    LaunchedEffect(key1 = true) {
+        launcher.launch(Manifest.permission.CAMERA)
+    }
+    if (hasCamPermission) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorResource(id = R.color.mainColor)),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.TopStart
             ) {
-                localUriHandler.openUri(barcodeValue!!)
+                Text(
+                    text = "QrCode Scanner",
+                    style = MaterialTheme.typography.h6.copy(color = Color.White),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp),
+                    textAlign = TextAlign.Center
+                )
             }
+            Box(
+                modifier = Modifier
+                    .width(310.dp)
+                    .height(390.dp)
+                    .padding(30.dp)
+                //  .border(6.dp, color = colorResource(id = R.color.yelllow))
+            ) {
+                scanner(barcodeValuee = barcodeValuee)
+            }
+
+            // torchApplication(context)
+            //  drawRectangle()
+        }
+    }
+}
+
+@Composable
+fun scanner(
+    barcodeValuee: MutableState<String>
+) {
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var preview by remember { mutableStateOf<Preview?>(null) }
+    var barcodeRect by remember { mutableStateOf<Rect?>(null) }
+    AndroidView(
+        factory = { AndroidViewContext ->
+            PreviewView(AndroidViewContext).apply {
+                this.scaleType = PreviewView.ScaleType.FILL_CENTER
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+            }
+        },
+        update = { previewView ->
+            val cameraSelector: CameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build()
+            val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+            val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+                ProcessCameraProvider.getInstance(context)
+
+            cameraProviderFuture.addListener({
+                preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                val mediaPlayer = MediaPlayer.create(context, R.raw.scan_soundd)
+                val barcodeAnalyser = BarcodeAnalyser { barcodes, rect ->
+                    barcodes.forEach { barcode ->
+                        barcode.rawValue?.let { barcodeValue ->
+
+                            vibrator.vibrate(100) //for sound
+                            mediaPlayer.start()
+                            barcodeValuee.value = barcodeValue
+                        }
+                    }
+                    barcodeRect = rect
+                }
+                val imageAnalysis: ImageAnalysis = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+                    .also {
+                        it.setAnalyzer(cameraExecutor, barcodeAnalyser)
+                    }
+
+                try {
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        lifecycleOwner,
+                        cameraSelector,
+                        preview,
+                        imageAnalysis
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("qr code", e.message ?: "")
+                }
+            }, ContextCompat.getMainExecutor(context))
+        }
+    )
+    drawRectangle(barcodeRect = barcodeRect)
+}
+
+@Composable
+fun drawRectangle(
+    barcodeRect: Rect?
+) {
+
+    val color = colorResource(id = R.color.mainColor)
+    barcodeRect?.let { rect ->
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawRect(
+                color = color,
+                topLeft = Offset(rect.left.toFloat(), rect.top.toFloat()),
+                size = Size(
+                    rect.width().toFloat(),
+                    rect.height().toFloat()
+                ),
+                style = Stroke(width = 4.dp.toPx())
+            )
         }
     }
 }

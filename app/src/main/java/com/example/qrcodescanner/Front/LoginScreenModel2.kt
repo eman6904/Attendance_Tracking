@@ -47,9 +47,9 @@ fun login2(navController: NavHostController) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-       val  errorMessage= remember { mutableStateOf("")}
-       val  shutDownError= remember { mutableStateOf(false)}
-        errorDialog(shutDownError,errorMessage)
+        val errorMessage = remember { mutableStateOf("") }
+        val shutDownError = remember { mutableStateOf(false) }
+        errorDialog(shutDownError, errorMessage)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -93,7 +93,7 @@ fun headerSection() {
                 shape = RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp),
 
                 ) {
-                if(getMode().toString()=="Dark Mode"||getMode()==null){
+                if (getMode().toString() == "Dark Mode" || getMode() == null) {
                     Image(
                         painterResource(R.drawable.icpc_logo_light),
                         modifier = Modifier
@@ -102,7 +102,7 @@ fun headerSection() {
                         contentDescription = "",
                     )
 
-                }else{
+                } else {
                     Image(
                         painterResource(R.drawable.icpc_logo_night),
                         modifier = Modifier
@@ -120,13 +120,13 @@ fun headerSection() {
         ) {
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text="ISc System",
+                text = "ISc System",
                 fontSize = 15.sp,
-                color=Color.White,
+                color = Color.White,
             )
             Text(
                 "Attendance registration",
-                color=Color.White,
+                color = Color.White,
                 fontSize = 20.sp,
                 fontFamily = FontFamily(Font(R.font.bold2)),
             )
@@ -137,8 +137,8 @@ fun headerSection() {
 @Composable
 fun mainContent2(
     navController: NavHostController,
-    shutDownError:MutableState<Boolean>,
-    errorMessage:MutableState<String>
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>
 ) {
 
     val userName = rememberSaveable() { mutableStateOf("") }
@@ -146,9 +146,15 @@ fun mainContent2(
     var emptyPassword = rememberSaveable() { mutableStateOf(false) }
     var emptyUserName = rememberSaveable() { mutableStateOf(false) }
     val scop = rememberCoroutineScope()
-    val rememberMe= MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME,null)
-    val userData = remember { mutableStateOf(UserData("", "",
-        "", emptyList(), "", "")) }
+    val rememberMe = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
+    val userData = remember {
+        mutableStateOf(
+            UserData(
+                "", "",
+                "", emptyList(), "", ""
+            )
+        )
+    }
     val modifierForEmptyField = Modifier
         .fillMaxWidth()
         .padding(start = 20.dp, end = 20.dp)
@@ -159,10 +165,10 @@ fun mainContent2(
 
     val showProgress = remember { mutableStateOf(false) }
 
-    if(rememberMe.toString()=="true"&& getLoginData() !=null){
+    if (rememberMe.toString() == "true" && getLoginData() != null) {
 
-        userName.value= getLoginData()!!.userName
-        password.value= getLoginData()!!.password
+        userName.value = getLoginData()!!.userName
+        password.value = getLoginData()!!.password
     }
 
     Column(
@@ -174,121 +180,122 @@ fun mainContent2(
         verticalArrangement = Arrangement.Center
     ) {
 
-       Box(
-           modifier= Modifier
-               .weight(1f)
-               .fillMaxSize(),
-           contentAlignment = Alignment.Center
-       ){
-           if (emptyUserName.value == false || userName.value.isNotEmpty())
-               userNameField2(userName, modifierForNotEmptyField)
-           else
-               userNameField2(userName, modifierForEmptyField)
-       }
-      //  space(h = 25)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (emptyUserName.value == false || userName.value.isNotEmpty())
+                userNameField2(userName, modifierForNotEmptyField)
+            else
+                userNameField2(userName, modifierForEmptyField)
+        }
+        //  space(h = 25)
 
-       Box(
-           modifier= Modifier
-               .weight(1f)
-               .fillMaxSize(),
-           contentAlignment = Alignment.Center
-       ){
-           if (emptyPassword.value == false || password.value.isNotEmpty())
-               passwordField2(password, modifierForNotEmptyField)
-           else
-               passwordField2(password, modifierForEmptyField)
-       }
-       // space(h = 25)
-       Box(
-           modifier= Modifier
-               .weight(1f)
-               .fillMaxSize(),
-           contentAlignment = Alignment.Center
-       ){
-           Column() {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (emptyPassword.value == false || password.value.isNotEmpty())
+                passwordField2(password, modifierForNotEmptyField)
+            else
+                passwordField2(password, modifierForEmptyField)
+        }
+        // space(h = 25)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column() {
 
-               Button(
-                   onClick = {
-                       if (userName.value.isNotEmpty() && password.value.isNotEmpty()) {
-                           scop.launch {
-                               login(
-                                  loginData =  LoginRequirements(
-                                       userName = userName.value,
-                                       password = password.value
-                                   ),
-                                   userData = userData,
-                                   navController = navController,
-                                   shutDownError = shutDownError,
-                                   errorMessage = errorMessage,
-                                   showProgress = showProgress
-                               )
-                           }
-                           showProgress.value = true
-                       }
-                       emptyPassword.value = password.value.isEmpty()
-                       emptyUserName.value = userName.value.isEmpty()
+                Button(
+                    onClick = {
+                        if (userName.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            scop.launch {
+                                login(
+                                    loginData = LoginRequirements(
+                                        userName = userName.value,
+                                        password = password.value
+                                    ),
+                                    userData = userData,
+                                    navController = navController,
+                                    shutDownError = shutDownError,
+                                    errorMessage = errorMessage,
+                                    showProgress = showProgress
+                                )
+                            }
+                            showProgress.value = true
+                        }
+                        emptyPassword.value = password.value.isEmpty()
+                        emptyUserName.value = userName.value.isEmpty()
 
-                   },
-                   modifier = Modifier
-                       .padding(start = 20.dp, end = 20.dp, top = 5.dp)
-                       .fillMaxWidth(),
-                   shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                   colors = ButtonDefaults.buttonColors(
-                       backgroundColor = colorResource(id = R.color.mainColor)
-                   )
-               ) {
-                   Text(text = "LOGIN", color = Color.White, modifier = Modifier.padding(9.dp))
-               }
-               space(5)
-               Box(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(start = 10.dp, end = 20.dp, top = 10.dp),
-                   contentAlignment = Alignment.TopStart
-               ) {
-                   checkBox("Remember me")
-               }
-           }
-       }
-       Box(
-           modifier= Modifier
-               .weight(1f)
-               .fillMaxSize(),
-           contentAlignment = Alignment.Center
-       ){
-          Column(){
-              if (showProgress.value) {
+                    },
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 5.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(id = R.color.mainColor)
+                    )
+                ) {
+                    Text(text = "LOGIN", color = Color.White, modifier = Modifier.padding(9.dp))
+                }
+                space(5)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 20.dp, top = 10.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    checkBox("Remember me")
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column() {
+                if (showProgress.value) {
 
-                  Column(
-                      modifier = Modifier.fillMaxWidth(),
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.Center
-                  ) {
-                      CircularProgressIndicator(
-                          color = colorResource(id = R.color.mainColor),
-                          strokeWidth = 3.dp,
-                          modifier = Modifier.size(25.dp)
-                      )
-                  }
-              }
-              Box(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-                  contentAlignment = Alignment.Center
-              ) {
-                  ClickableText(
-                      text = AnnotatedString("Forgot Your Password?"),
-                      style = TextStyle(
-                          color = MaterialTheme.colors.onSurface),
-                      onClick =
-                      {
-                          navController.navigate(ScreensRoute.ForgetPasswordScreen.route)
-                      }
-                  )
-              }
-          }
-       }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = colorResource(id = R.color.mainColor),
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ClickableText(
+                        text = AnnotatedString("Forgot Your Password?"),
+                        style = TextStyle(
+                            color = MaterialTheme.colors.onSurface
+                        ),
+                        onClick =
+                        {
+                            navController.navigate(ScreensRoute.ForgetPasswordScreen.route)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -300,7 +307,7 @@ fun passwordField2(password: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
         TextField(
             value = password.value,
@@ -314,7 +321,7 @@ fun passwordField2(password: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor =MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -361,7 +368,7 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
 
         TextField(
@@ -377,7 +384,7 @@ fun userNameField2(userName: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor =MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -420,12 +427,12 @@ fun progressBar(show: MutableState<Boolean>) {
 @Composable
 fun checkBox(item: String) {
 
-    val oldState= MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME,null)
+    val oldState = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
     var myState = remember { mutableStateOf(false) }
-    if(oldState=="false"||oldState==null)
-       myState.value=false
+    if (oldState == "false" || oldState == null)
+        myState.value = false
     else
-        myState.value=true
+        myState.value = true
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
@@ -433,8 +440,9 @@ fun checkBox(item: String) {
             checked = myState.value,
             onCheckedChange = {
                 myState.value = it
-                MainActivity.rememberMe_sharedPref.edit().putString(MainActivity.REMEMBER_ME, it.toString()).apply()
-                              },
+                MainActivity.rememberMe_sharedPref.edit()
+                    .putString(MainActivity.REMEMBER_ME, it.toString()).apply()
+            },
             colors = CheckboxDefaults.colors(
                 uncheckedColor = colorResource(id = R.color.mainColor),
                 checkedColor = colorResource(id = R.color.mainColor),

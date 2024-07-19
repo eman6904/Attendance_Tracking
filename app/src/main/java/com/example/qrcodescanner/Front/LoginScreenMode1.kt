@@ -28,12 +28,12 @@ import androidx.compose.ui.unit.dp
 import com.example.qrcodescanner.R
 
 @Composable
-fun login1(){
+fun login1() {
 
     val userName = rememberSaveable() { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
-    var emptyPassword = rememberSaveable() { mutableStateOf(false)}
-    var emaptyUserName = rememberSaveable() { mutableStateOf(false)}
+    var emptyPassword = rememberSaveable() { mutableStateOf(false) }
+    var emaptyUserName = rememberSaveable() { mutableStateOf(false) }
     val modifierForEmptyField = Modifier
         .fillMaxSize()
         .padding(start = 10.dp, end = 10.dp)
@@ -44,69 +44,75 @@ fun login1(){
 
 
     Box(
-        modifier= Modifier
+        modifier = Modifier
             .fillMaxSize()
-    ){
-       Column(
-           modifier= Modifier
-               .fillMaxSize()
-       ){
-           Box(
-               modifier= Modifier
-                   .weight(1.2f)
-                   .fillMaxSize()
-           ){
-               HalfCircle(colorResource(id = R.color.mainColor))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1.2f)
+                    .fillMaxSize()
+            ) {
+                HalfCircle(colorResource(id = R.color.mainColor))
 
-           }
-           Column(
+            }
+            Column(
 
-               modifier= Modifier
-                   .fillMaxSize()
-                   .weight(0.8f)
-                   .padding(15.dp)
-           ){
-               Box(
-                   modifier=Modifier.weight(1f).padding(top=10.dp,bottom=10.dp)
-               ){
-                   if(emaptyUserName.value==false||userName.value.isNotEmpty())
-                       userNameField(userName,modifierForNotEmptyField)
-                   else
-                       userNameField(userName,modifierForEmptyField)
-               }
-               Box(
-                   modifier=Modifier.weight(1f).padding(top=10.dp,bottom=10.dp)
-               ){
-                   if(emptyPassword.value==false||password.value.isNotEmpty())
-                       passwordField(password,modifierForNotEmptyField)
-                   else
-                       passwordField(password,modifierForEmptyField)
-               }
-               Box(
-                   modifier=Modifier.weight(1f)
-               ){
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.8f)
+                    .padding(15.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 10.dp, bottom = 10.dp)
+                ) {
+                    if (emaptyUserName.value == false || userName.value.isNotEmpty())
+                        userNameField(userName, modifierForNotEmptyField)
+                    else
+                        userNameField(userName, modifierForEmptyField)
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 10.dp, bottom = 10.dp)
+                ) {
+                    if (emptyPassword.value == false || password.value.isNotEmpty())
+                        passwordField(password, modifierForNotEmptyField)
+                    else
+                        passwordField(password, modifierForEmptyField)
+                }
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
 
-                   Button(
-                       onClick = {
+                    Button(
+                        onClick = {
 
-                       },
-                       modifier=Modifier.padding(top=10.dp,start=10.dp,end=10.dp).fillMaxWidth(),
-                       shape=RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                       colors=ButtonDefaults.buttonColors(
-                           backgroundColor = colorResource(id = R.color.mainColor)
-                       )
-                   ){
-                     Text(text="LOGIN",color=Color.White,modifier=Modifier.padding(5.dp))
-                   }
-               }
+                        },
+                        modifier = Modifier
+                            .padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = colorResource(id = R.color.mainColor)
+                        )
+                    ) {
+                        Text(text = "LOGIN", color = Color.White, modifier = Modifier.padding(5.dp))
+                    }
+                }
 
-           }
-       }
+            }
+        }
 
         Row(
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(top =90.dp,start=30.dp,end=30.dp)
-        ){
+            modifier = Modifier.padding(top = 90.dp, start = 30.dp, end = 30.dp)
+        ) {
             Image(
                 painterResource(R.drawable.icpc_family),
                 modifier = Modifier
@@ -119,14 +125,20 @@ fun login1(){
 
     }
 }
+
 @Composable
-fun HalfCircle(color:Color,startAngle:Int=-90,sweepAngle:Int=180) {
+fun HalfCircle(color: Color, startAngle: Int = -90, sweepAngle: Int = 180) {
     Canvas(modifier = Modifier.fillMaxSize()) {
-        drawHalfCircle(this,color,startAngle,sweepAngle)
+        drawHalfCircle(this, color, startAngle, sweepAngle)
     }
 }
 
-fun drawHalfCircle(drawScope: DrawScope,color:Color,startAngle:Int=-90,sweepAngle:Int=180) {
+fun drawHalfCircle(
+    drawScope: DrawScope,
+    color: Color,
+    startAngle: Int = -90,
+    sweepAngle: Int = 180
+) {
     val canvasWidth = drawScope.size.width
     val canvasHeight = drawScope.size.height
 
@@ -138,27 +150,31 @@ fun drawHalfCircle(drawScope: DrawScope,color:Color,startAngle:Int=-90,sweepAngl
         startAngle = startAngle.toFloat(),
         sweepAngle = sweepAngle.toFloat(),
         useCenter = false,
-        topLeft = Offset(-(canvasWidth)/2f, 0f),
+        topLeft = Offset(-(canvasWidth) / 2f, 0f),
         size = Size(diameter, diameter)
     )
 }
+
 @Composable
-fun passwordField(password: MutableState<String>,modifier:Modifier) {
+fun passwordField(password: MutableState<String>, modifier: Modifier) {
 
     var passwordVisible = rememberSaveable { mutableStateOf(false) }
     Card(
-        modifier=modifier,
+        modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
     ) {
         TextField(
             value = password.value,
             onValueChange = { password.value = it },
-            placeholder = {Box(
-                contentAlignment = Alignment.CenterStart,
-                modifier = Modifier.fillMaxSize()){
-                Text(text = "Password")
-            } },
+            placeholder = {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(text = "Password")
+                }
+            },
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
@@ -196,23 +212,27 @@ fun passwordField(password: MutableState<String>,modifier:Modifier) {
         )
     }
 }
+
 @Composable
 fun userNameField(userName: MutableState<String>, modifier: Modifier) {
 
     Card(
-        modifier =modifier,
+        modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
     ) {
         TextField(
-            modifier=Modifier,
+            modifier = Modifier,
             value = userName.value,
             onValueChange = { userName.value = it },
-            placeholder = {Box(
-                contentAlignment = Alignment.CenterStart,
-                modifier = Modifier.fillMaxSize()){
-                Text(text = "User Name")
-            } },
+            placeholder = {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(text = "User Name")
+                }
+            },
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,

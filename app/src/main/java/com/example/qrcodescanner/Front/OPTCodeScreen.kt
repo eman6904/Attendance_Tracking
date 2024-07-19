@@ -42,8 +42,8 @@ fun OTPCode(navController: NavHostController, email: String) {
     otpDigits.add(remember { mutableStateOf("") })
     otpDigits.add(remember { mutableStateOf("") })
     otpDigits.add(remember { mutableStateOf("") })
-    val  errorMessage= remember { mutableStateOf("")}
-    val  shutDownError= remember { mutableStateOf(false)}
+    val errorMessage = remember { mutableStateOf("") }
+    val shutDownError = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -95,18 +95,18 @@ fun OTPCode(navController: NavHostController, email: String) {
                     text = "Enter OTP",
                     fontSize = 25.sp,
                     fontFamily = FontFamily(Font(R.font.bold2)),
-                    color=MaterialTheme.colors.onSurface
+                    color = MaterialTheme.colors.onSurface
                 )
                 space(h = 15)
                 Text(
                     text = "4 digits code has been sent to :",
                     fontSize = 20.sp,
-                    color=MaterialTheme.colors.onSurface
+                    color = MaterialTheme.colors.onSurface
                 )
                 Text(
                     text = email,
                     fontSize = 18.sp,
-                    color=MaterialTheme.colors.onSurface
+                    color = MaterialTheme.colors.onSurface
                 )
             }
             space(h = 20)
@@ -157,8 +157,8 @@ fun confirmButton(
     email: String,
     showProgress: MutableState<Boolean>,
     navController: NavHostController,
-    shutDownError:MutableState<Boolean>,
-    errorMessage:MutableState<String>
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>
 ) {
 
     val otpNumber = remember { mutableStateOf<Int>(0) }
@@ -168,9 +168,9 @@ fun confirmButton(
     val shutDown = remember { mutableStateOf(false) }
 
 
-    if(message.value.isNotEmpty()) {
+    if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value=false
+        showProgress.value = false
     }
     if (shutDown.value)
         checkOtpDialog(
@@ -190,7 +190,7 @@ fun confirmButton(
                 email,
                 otpNumber.value,
                 isSuccess,
-                message ,
+                message,
                 token2,
                 shutDownError,
                 errorMessage,
@@ -201,8 +201,9 @@ fun confirmButton(
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.mainColor)
         ),
-        modifier = Modifier.fillMaxWidth()
-            .padding(start=10.dp,end=10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp),
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
     ) {
 
@@ -224,7 +225,7 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
 
         Box(
@@ -238,7 +239,7 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()
-                    ){
+                    ) {
                         Text(
                             text = " * ",
                             textAlign = TextAlign.Center, // Center the placeholder text
@@ -247,7 +248,7 @@ fun OTPDigit(digit: MutableState<String>, modifier: Modifier) {
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor =MaterialTheme.colors.secondary,
+                    backgroundColor = MaterialTheme.colors.secondary,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     cursorColor = Color.Gray,
@@ -271,7 +272,7 @@ fun calcOtpNumber(
     otpNumber: MutableState<Int>
 ) {
 
-    otpNumber.value=0
+    otpNumber.value = 0
     for (i in 0..3) {
         otpNumber.value *= 10
         if (otpDigits[i].value.isNotEmpty())
@@ -292,7 +293,7 @@ fun checkOtpDialog(
         Dialog(
             onDismissRequest = {
                 shutDown.value = false
-                message.value= listOf()
+                message.value = listOf()
             }) {
 
             Card(
@@ -311,29 +312,29 @@ fun checkOtpDialog(
                     verticalArrangement = Arrangement.Center
                 ) {
                     space(h = 10)
-                    if(isSuccess.value){
+                    if (isSuccess.value) {
                         Text(
                             text = "Success!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
-                    }else{
+                    } else {
                         Text(
                             text = "Failed!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
                     }
                     space(h = 10)
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ){
-                        for(item in message.value){
+                    ) {
+                        for (item in message.value) {
                             Text(
                                 text = item,
                             )
@@ -344,7 +345,7 @@ fun checkOtpDialog(
                     Button(
                         onClick = {
                             shutDown.value = false
-                            message.value= listOf()
+                            message.value = listOf()
                             val encodedEmail = URLEncoder.encode(email, "UTF-8")
                             val encodedToken = URLEncoder.encode(token2, "UTF-8")
                             if (isSuccess.value)

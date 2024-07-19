@@ -39,8 +39,8 @@ fun forgetPassword(navController: NavHostController) {
     val email = rememberSaveable { mutableStateOf("") }
     var emptyMail = rememberSaveable() { mutableStateOf(false) }
     var showProgress = rememberSaveable() { mutableStateOf(false) }
-    val  errorMessage= remember { mutableStateOf("")}
-    val  shutDownError= remember { mutableStateOf(false)}
+    val errorMessage = remember { mutableStateOf("") }
+    val shutDownError = remember { mutableStateOf(false) }
 
     val modifierForEmptyField = Modifier
         .fillMaxWidth()
@@ -51,7 +51,7 @@ fun forgetPassword(navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.surface)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,19 +102,19 @@ fun forgetPassword(navController: NavHostController) {
                         text = "Forgot",
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(R.font.bold2)),
-                        color=MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colors.onSurface
                     )
                     Text(
                         text = "Password?",
                         fontSize = 25.sp,
                         fontFamily = FontFamily(Font(R.font.bold2)),
-                        color=MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colors.onSurface
                     )
                     space(h = 15)
                     Text(
                         text = "Don't worry it happens.Please enter email " +
                                 "address associated with your account.",
-                        color=MaterialTheme.colors.onSurface,
+                        color = MaterialTheme.colors.onSurface,
                         fontSize = 15.sp
                     )
                 }
@@ -139,8 +139,8 @@ fun forgetPassword(navController: NavHostController) {
                     Column() {
                         space(h = 15)
                         sendButton(
-                            email=email,
-                            emptyEmail=emptyMail,
+                            email = email,
+                            emptyEmail = emptyMail,
                             navController,
                             showProgress,
                             shutDownError,
@@ -164,7 +164,7 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
         elevation = 3.dp,
-        backgroundColor =MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary,
     ) {
 
         TextField(
@@ -180,7 +180,7 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor =MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Gray,
@@ -205,47 +205,47 @@ fun emailField(email: MutableState<String>, modifier: Modifier) {
 
 @Composable
 fun sendButton(
-email:MutableState<String>,
-emptyEmail:MutableState<Boolean>,
-navController: NavHostController,
-showProgress:MutableState<Boolean>,
-shutDownError:MutableState<Boolean>,
-errorMessage:MutableState<String>
+    email: MutableState<String>,
+    emptyEmail: MutableState<Boolean>,
+    navController: NavHostController,
+    showProgress: MutableState<Boolean>,
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>
 ) {
 
     val message = remember { mutableStateOf(listOf<String>()) }
-    val isSuccess=remember{ mutableStateOf(false)}
-    val shutDown=remember{ mutableStateOf(false)}
+    val isSuccess = remember { mutableStateOf(false) }
+    val shutDown = remember { mutableStateOf(false) }
 
-    if(message.value.isNotEmpty()) {
+    if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value=false
+        showProgress.value = false
     }
 
-    if(shutDown.value)
+    if (shutDown.value)
         checkEmailDialog(
             shutDown = shutDown,
             message = message,
-            isSuccess =isSuccess,
-            navController =navController,
+            isSuccess = isSuccess,
+            navController = navController,
             email = email.value
         )
 
     Button(
         onClick = {
-                  if(email.value.isNotEmpty()){
-                      forgotPassword(
-                          email.value,
-                          isSuccess,
-                          message,
-                          shutDownError,
-                          errorMessage,
-                          showProgress
-                      )
-                      showProgress.value=true
-                   }else{
-                       emptyEmail.value=true
-                   }
+            if (email.value.isNotEmpty()) {
+                forgotPassword(
+                    email.value,
+                    isSuccess,
+                    message,
+                    shutDownError,
+                    errorMessage,
+                    showProgress
+                )
+                showProgress.value = true
+            } else {
+                emptyEmail.value = true
+            }
         },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.mainColor)
@@ -262,19 +262,20 @@ errorMessage:MutableState<String>
         )
     }
 }
+
 @Composable
 fun checkEmailDialog(
-    shutDown:MutableState<Boolean>,
+    shutDown: MutableState<Boolean>,
     message: MutableState<List<String>>,
-    isSuccess:MutableState<Boolean>,
+    isSuccess: MutableState<Boolean>,
     navController: NavHostController,
-    email:String
+    email: String
 ) {
     if (shutDown.value) {
         Dialog(
             onDismissRequest = {
                 shutDown.value = false
-                message.value= listOf()
+                message.value = listOf()
             }) {
 
             Card(
@@ -292,29 +293,29 @@ fun checkEmailDialog(
                     verticalArrangement = Arrangement.Center
                 ) {
                     space(h = 10)
-                    if(isSuccess.value){
+                    if (isSuccess.value) {
                         Text(
                             text = "Success!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
-                    }else{
+                    } else {
                         Text(
                             text = "Failed!",
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color= colorResource(id = R.color.mainColor)
+                            color = colorResource(id = R.color.mainColor)
                         )
                     }
                     space(h = 10)
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ){
-                        for(item in message.value){
+                    ) {
+                        for (item in message.value) {
                             Text(
                                 text = item,
                             )
@@ -325,19 +326,18 @@ fun checkEmailDialog(
                     Button(
                         onClick = {
                             shutDown.value = false
-                            message.value= listOf()
-                            if(isSuccess.value)
-                                navController.navigate(ScreensRoute.OTPCodeScreen.route+"/$email")
+                            message.value = listOf()
+                            if (isSuccess.value)
+                                navController.navigate(ScreensRoute.OTPCodeScreen.route + "/$email")
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = colorResource(id = R.color.mainColor)
-                        )
-                    , modifier = Modifier.fillMaxWidth()
+                        ), modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = "OK",
                             fontSize = 15.sp,
-                            color=Color.White
+                            color = Color.White
                         )
                     }
                 }

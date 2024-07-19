@@ -47,7 +47,7 @@ fun getAllTrainees(
     showProgress: MutableState<Boolean>,
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
-    noTrainee:MutableState<Boolean>
+    noTrainee: MutableState<Boolean>
 ) {
 
     val campId = getCurrentCamp()?.id?.toInt()
@@ -63,14 +63,14 @@ fun getAllTrainees(
 
                         trainees.clear()
                         noTrainee.value = false
-                        showProgress.value=true
+                        showProgress.value = true
                         if (response.isSuccessful) {
 
                             if (response.body()!!.data.isEmpty())
                                 noTrainee.value = true
                             else
                                 trainees.addAll(response!!.body()!!.data)
-                            showProgress.value=false
+                            showProgress.value = false
                         } else {
 
                             shutDownError.value = true
@@ -83,7 +83,8 @@ fun getAllTrainees(
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -104,16 +105,17 @@ fun getPresentTrainees(
     showProgress: MutableState<Boolean>,
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
-    selectedTrainee:MutableState<String>
+    selectedTrainee: MutableState<String>
 ) {
 
     val campId = getCurrentCamp()?.id?.toInt()
-    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
     var currentDate = sdf.format(Date())
 
     GlobalScope.launch(Dispatchers.IO) {
         try {
-            connect.connect().getPresentTrainees(campId!!, currentDate,selectedTrainee.value,"Bearer $token")
+            connect.connect()
+                .getPresentTrainees(campId!!, currentDate, selectedTrainee.value, "Bearer $token")
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(
                         call: Call<ApiResponse>,
@@ -125,7 +127,7 @@ fun getPresentTrainees(
                         showProgress.value = true
 
                         if (response.isSuccessful) {
-                           // Log.d("response", "${response.body()}")
+
                             if (response.body()!!.message == "No current session for now.")
                                 itemsCase.value = "No current session for now."
                             else {
@@ -153,7 +155,8 @@ fun getPresentTrainees(
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                         showProgress.value = false
                     }
                 })
@@ -181,14 +184,14 @@ fun getCamps(
 
                     camps.clear()
                     itemsCase.value = ""
-                    showProgress.value=true
+                    showProgress.value = true
                     if (response.isSuccessful) {
 
                         if (response.body()!!.data == null)
                             itemsCase.value = "No Camps"
                         camps.addAll(response.body()!!.data)
-                        if(itemsCase.value.isNotEmpty()||camps.isNotEmpty())
-                        showProgress.value = false
+                        if (itemsCase.value.isNotEmpty() || camps.isNotEmpty())
+                            showProgress.value = false
 
                     } else {
                         shutDownError.value = true
@@ -202,7 +205,7 @@ fun getCamps(
 
 
                     shutDownError.value = true
-                    errorMessage.value = "Network error: " +"Please check your internet connection"
+                    errorMessage.value = "Network error: " + "Please check your internet connection"
                     showProgress.value = false
                 }
             })
@@ -232,10 +235,12 @@ fun addTraineeToAttendance(
                         call: Call<ApiResponse>,
                         response: Response<ApiResponse>
                     ) {
-                        val result = response.body()
 
+                        message.value = ""
+                        isSuccess.value = false
+                        Log.d("api_response", response.body().toString())
                         if (response.isSuccessful) {
-
+                            val result = response.body()
                             message.value = result!!.message
                             isSuccess.value = result.isSuccess
                             shutDown.value = true
@@ -249,7 +254,8 @@ fun addTraineeToAttendance(
 
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " + t.message.toString()
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                     }
 
                 })
@@ -261,11 +267,13 @@ fun addTraineeToAttendance(
     }
 }
 
-fun traineePointsUpdate(extraPoint: ExtraPointRequirements,
-                        isSuccess: MutableState<Boolean>,
-                        message: MutableState<String>,
-                        shutDownError: MutableState<Boolean>,
-                        errorMessage: MutableState<String>,) {
+fun traineePointsUpdate(
+    extraPoint: ExtraPointRequirements,
+    isSuccess: MutableState<Boolean>,
+    message: MutableState<String>,
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>,
+) {
     GlobalScope.launch(Dispatchers.IO) {
         try {
             connect.connect().traineePointsUpdate(extraPoint, "Bearer $token")
@@ -291,7 +299,8 @@ fun traineePointsUpdate(extraPoint: ExtraPointRequirements,
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                     }
 
                 })
@@ -304,12 +313,14 @@ fun traineePointsUpdate(extraPoint: ExtraPointRequirements,
 
 }
 
-fun forgotPassword(email: String,
-  isSuccess: MutableState<Boolean>,
-  message: MutableState<List<String>>,
-  shutDownError: MutableState<Boolean>,
-  errorMessage: MutableState<String>,
-  showProgress: MutableState<Boolean>){
+fun forgotPassword(
+    email: String,
+    isSuccess: MutableState<Boolean>,
+    message: MutableState<List<String>>,
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>,
+    showProgress: MutableState<Boolean>
+) {
 
     GlobalScope.launch(Dispatchers.IO) {
         try {
@@ -319,9 +330,9 @@ fun forgotPassword(email: String,
                         call: Call<ForgetPasswordResponse>,
                         response: Response<ForgetPasswordResponse>
                     ) {
-                        message.value= listOf()
+                        message.value = listOf()
                         val apiResponse = response.body()
-                        isSuccess.value=false
+                        isSuccess.value = false
 
                         if (response.isSuccessful) {
                             isSuccess.value = apiResponse!!.isSuccess
@@ -343,7 +354,7 @@ fun forgotPassword(email: String,
 
                             shutDownError.value = true
                             errorMessage.value = response.message()
-                            showProgress.value=false
+                            showProgress.value = false
                         }
 
                     }
@@ -351,8 +362,9 @@ fun forgotPassword(email: String,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
-                        showProgress.value=false
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
+                        showProgress.value = false
                     }
 
                 })
@@ -360,20 +372,22 @@ fun forgotPassword(email: String,
 
             shutDownError.value = true
             errorMessage.value = "Unexpected error: " + e.message.toString()
-            showProgress.value=false
+            showProgress.value = false
         }
     }
 
 }
 
-fun checkOtp(email: String,
-             otp: Int,
-             isSuccess: MutableState<Boolean>,
-             message: MutableState<List<String>>,
-             token2: MutableState<String>,
-             shutDownError: MutableState<Boolean>,
-             errorMessage: MutableState<String>,
-             showProgress: MutableState<Boolean>) {
+fun checkOtp(
+    email: String,
+    otp: Int,
+    isSuccess: MutableState<Boolean>,
+    message: MutableState<List<String>>,
+    token2: MutableState<String>,
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>,
+    showProgress: MutableState<Boolean>
+) {
 
     GlobalScope.launch(Dispatchers.IO) {
         try {
@@ -386,7 +400,7 @@ fun checkOtp(email: String,
 
                         val apiResponse = response.body()
                         message.value = listOf()
-                        isSuccess.value=false
+                        isSuccess.value = false
 
                         if (response.isSuccessful) {
 
@@ -419,7 +433,8 @@ fun checkOtp(email: String,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -432,12 +447,15 @@ fun checkOtp(email: String,
         }
     }
 }
-fun resetPassword( resetRequirements: PasswordResetRequirements,
-                   isSuccess: MutableState<Boolean>,
-                   message: MutableState<List<String>>,
-                   shutDownError: MutableState<Boolean>,
-                   errorMessage: MutableState<String>,
-                   showProgress: MutableState<Boolean>) {
+
+fun resetPassword(
+    resetRequirements: PasswordResetRequirements,
+    isSuccess: MutableState<Boolean>,
+    message: MutableState<List<String>>,
+    shutDownError: MutableState<Boolean>,
+    errorMessage: MutableState<String>,
+    showProgress: MutableState<Boolean>
+) {
 
     GlobalScope.launch(Dispatchers.IO) {
         try {
@@ -481,7 +499,8 @@ fun resetPassword( resetRequirements: PasswordResetRequirements,
                     override fun onFailure(call: Call<ForgetPasswordResponse>, t: Throwable) {
 
                         shutDownError.value = true
-                        errorMessage.value = "Network error: " +"Please check your internet connection"
+                        errorMessage.value =
+                            "Network error: " + "Please check your internet connection"
                         showProgress.value = false
                     }
 
@@ -495,6 +514,7 @@ fun resetPassword( resetRequirements: PasswordResetRequirements,
     }
 
 }
+
 fun login(
     loginData: LoginRequirements,
     shutDownError: MutableState<Boolean>,
@@ -518,13 +538,13 @@ fun login(
                         val result = loginResponse!!.message
 
                         if (result == "Success") {
-                           // Log.d("responsee","${response.body()}")
+                            Log.d("responsee", "${response.body()}")
                             val json2 = gson.toJson(loginResponse.data)
                             MainActivity.selectedUser_sharedPref.edit()
                                 .putString(MainActivity.SELECTED_USER, json2).apply()
 
-                            val json3=gson.toJson(loginData)
-                            userData_sharedPref.edit().putString(LOGIN_REQUIREMENTS,json3).apply()
+                            val json3 = gson.toJson(loginData)
+                            userData_sharedPref.edit().putString(LOGIN_REQUIREMENTS, json3).apply()
 
                             if (getCurrentUser()?.token == loginResponse.data!!.token)
                                 navController.navigate(ScreensRoute.MainScreen.route)
@@ -550,7 +570,7 @@ fun login(
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
 
                     shutDownError.value = true
-                    errorMessage.value = "Network error: " +"Please check your internet connection"
+                    errorMessage.value = "Network error: " + "Please check your internet connection"
                     showProgress.value = false
                 }
             })
@@ -575,13 +595,14 @@ fun getCurrentUser(): UserData? {
 
 @Composable
 fun errorDialog(
-    shutDown:MutableState<Boolean>,
-    errorMessage:MutableState<String>) {
+    shutDown: MutableState<Boolean>,
+    errorMessage: MutableState<String>
+) {
 
-    if(shutDown.value){
+    if (shutDown.value) {
         Dialog(
             onDismissRequest = {
-                shutDown.value=false
+                shutDown.value = false
             }) {
             Card(
                 modifier = Modifier
@@ -612,10 +633,10 @@ fun errorDialog(
                     space(10)
                     Button(
                         onClick = {
-                            shutDown.value=false
+                            shutDown.value = false
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors= ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.Red
                         )
                     ) {
@@ -630,24 +651,26 @@ fun errorDialog(
         }
     }
 }
+
 fun logout(
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
     navController: NavHostController,
 ) {
-        try {
-            rememberMe_sharedPref.edit().putString(REMEMBER_ME,null).apply()
-            navController.navigate(ScreensRoute.LogInScreen.route) {
-                popUpTo(navController.graph.startDestinationId) {
-                    inclusive = true
-                }
+    try {
+        rememberMe_sharedPref.edit().putString(REMEMBER_ME, null).apply()
+        navController.navigate(ScreensRoute.LogInScreen.route) {
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
             }
-
-        } catch (e: Exception) {
-            shutDownError.value = true
-            errorMessage.value = "Unexpected error: " + e.message.toString()
         }
+
+    } catch (e: Exception) {
+        shutDownError.value = true
+        errorMessage.value = "Unexpected error: " + e.message.toString()
+    }
 }
+
 fun getCurrentCamp(): ItemData? {
 
     val gson = Gson()
@@ -656,6 +679,7 @@ fun getCurrentCamp(): ItemData? {
 
     return savedCamp
 }
+
 fun getLoginData(): LoginRequirements? {
 
     val gson = Gson()
@@ -671,11 +695,13 @@ fun getCurrentDate(): String {
 
     return currentDate
 }
-fun getMode():String?{
 
-   return MainActivity.mode_sharedPref.getString(MainActivity.MODE,null)
+fun getMode(): String? {
+
+    return MainActivity.mode_sharedPref.getString(MainActivity.MODE, null)
 }
-fun refresh(context:Context){
+
+fun refresh(context: Context) {
 
     val refreshIntent = Intent(context, MainActivity::class.java)
     refreshIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
