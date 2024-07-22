@@ -178,7 +178,7 @@ fun columnItem(traineeName: String, traineeHandle: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 5.dp, end = 5.dp)
+            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
             .height(90.dp),
         elevation = 20.dp
     ) {
@@ -220,20 +220,18 @@ fun columnItem(traineeName: String, traineeHandle: String) {
                         contentDescription = null,
                         modifier = Modifier
                             .size(20.dp)
-                            .weight(1f)
                     )
                     Text(
                         text = traineeHandle,
                         color = colorResource(id = cf_color.value),
                         fontSize = 15.sp,
-                        modifier = Modifier
-                            .weight(8f)
+                        modifier = Modifier.padding(start=2.dp)
+
                     )
                 }
             }
         }
     }
-    Divider(Modifier.height(3.dp), color = MaterialTheme.colors.surface)
 }
 
 @Composable

@@ -2,6 +2,7 @@ package com.example.qrcodescanner.Back.functions
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,6 @@ import com.example.qrcodescanner.ScreensRoute
 import com.example.qrcodescanner.Back.DataClasses.*
 import com.example.qrcodescanner.Front.space
 import com.example.qrcodescanner.MainActivity.Companion.LOGIN_REQUIREMENTS
-import com.example.qrcodescanner.MainActivity.Companion.MODE
 import com.example.qrcodescanner.MainActivity.Companion.REMEMBER_ME
 import com.example.qrcodescanner.MainActivity.Companion.rememberMe_sharedPref
 import com.example.qrcodescanner.MainActivity.Companion.userData_sharedPref
@@ -125,7 +125,7 @@ fun getPresentTrainees(
                         trainees.clear()
                         itemsCase.value = ""
                         showProgress.value = true
-
+                       //  Log.d("api_response",response.body().toString())
                         if (response.isSuccessful) {
 
                             if (response.body()!!.message == "No current session for now.")
@@ -221,30 +221,30 @@ fun getCamps(
 
 fun addTraineeToAttendance(
     traineeRequirements: AddTraineeRequirements,
-    isSuccess: MutableState<Boolean>,
-    message: MutableState<String>,
-    shutDown: MutableState<Boolean>,
+    navController: NavHostController,
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
 ) {
     GlobalScope.launch(Dispatchers.IO) {
         try {
             connect.connect().addTraineeToAttendance(traineeRequirements, "Bearer $token")
-                .enqueue(object : Callback<ApiResponse> {
+                .enqueue(object : Callback<AttendanceResponse> {
                     override fun onResponse(
-                        call: Call<ApiResponse>,
-                        response: Response<ApiResponse>
+                        call: Call<AttendanceResponse>,
+                        response: Response<AttendanceResponse>
                     ) {
 
-                        message.value = ""
-                        isSuccess.value = false
-                        Log.d("api_response", response.body().toString())
+                        Log.d("kkkkkkkkkk",response.body().toString())
                         if (response.isSuccessful) {
-                            val result = response.body()
-                            message.value = result!!.message
-                            isSuccess.value = result.isSuccess
-                            shutDown.value = true
 
+                            val apiResponseBody = response.body()!!
+                            if (apiResponseBody != null) {
+                                val apiResponseJson = Uri.encode(Gson().toJson(apiResponseBody))
+                                navController.navigate(ScreensRoute.TraineeScreen.route + "/${apiResponseJson}")
+                            } else {
+                                shutDownError.value = true
+                                errorMessage.value = "Response body is null"
+                            }
                         } else {
                             shutDownError.value = true
                             errorMessage.value = response.message()
@@ -252,7 +252,7 @@ fun addTraineeToAttendance(
 
                     }
 
-                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<AttendanceResponse>, t: Throwable) {
                         shutDownError.value = true
                         errorMessage.value =
                             "Network error: " + "Please check your internet connection"

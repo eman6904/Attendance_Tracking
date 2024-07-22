@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -36,16 +37,21 @@ import com.example.qrcodescanner.Back.DataClasses.LoginRequirements
 import com.example.qrcodescanner.Back.DataClasses.UserData
 import com.example.qrcodescanner.Back.functions.*
 import com.example.qrcodescanner.MainActivity
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.rememberImeNestedScrollConnection
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalAnimatedInsets::class)
 @Composable
 fun login2(navController: NavHostController) {
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .nestedScroll(connection = rememberImeNestedScrollConnection())
     ) {
         val errorMessage = remember { mutableStateOf("") }
         val shutDownError = remember { mutableStateOf(false) }

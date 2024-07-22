@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -36,83 +39,101 @@ import com.example.qrcodescanner.Back.DataClasses.ItemData
 import com.example.qrcodescanner.Back.functions.errorDialog
 import com.example.qrcodescanner.Back.functions.getAllTrainees
 import com.example.qrcodescanner.Back.functions.traineePointsUpdate
-
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.rememberImeNestedScrollConnection
 
 @Composable
-fun extraPoints(navHostController: NavHostController) {
+fun extraPoints(navController: NavHostController) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.mainColor)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorResource(id = R.color.mainColor)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-        var pointType = listOf("Plus", "Minus")
-        var selectedAction by remember { mutableStateOf("Points Action") }
-        var points = remember { mutableStateOf("") }
-        var points2 = remember { mutableStateOf(0) }
-        var searchedTrainee = remember { mutableStateOf("") }
-        var traineeId = remember { mutableStateOf("") }
-        val traineeNameRequired = remember { mutableStateOf(false) }
-        val pointsRequired = remember { mutableStateOf(false) }
-        val pointActionRequired = remember { mutableStateOf(false) }
-        val showSending = remember { mutableStateOf(false) }
-        val errorMessage = remember { mutableStateOf("") }
-        val shutDownError = remember { mutableStateOf(false) }
+            var pointType = listOf("Plus", "Minus")
+            var selectedAction by remember { mutableStateOf("Points Action") }
+            var points = remember { mutableStateOf("") }
+            var points2 = remember { mutableStateOf(0) }
+            var searchedTrainee = remember { mutableStateOf("") }
+            var traineeId = remember { mutableStateOf("") }
+            val traineeNameRequired = remember { mutableStateOf(false) }
+            val pointsRequired = remember { mutableStateOf(false) }
+            val pointActionRequired = remember { mutableStateOf(false) }
+            val showSending = remember { mutableStateOf(false) }
+            val errorMessage = remember { mutableStateOf("") }
+            val shutDownError = remember { mutableStateOf(false) }
 
-        errorDialog(
-            shutDown = shutDownError,
-            errorMessage = errorMessage
-        )
-
-        if (points.value != "")
-            points2.value = points.value.toInt()
-        Text(
-            text = "Extra Points",
-            fontSize = 30.sp,
-            fontFamily = FontFamily(Font(R.font.bold2)),
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 30.dp)
-        )
-        space(h = 30)
-        search(searchedTrainee, traineeId)
-        requiredField(show = traineeNameRequired)
-        space(h = 50)
-        pointsField(points = points)
-        requiredField(show = pointsRequired)
-        space(h = 50)
-        selectPointAction(
-            itemList = pointType,
-            selectedItem = selectedAction,
-            onItemSelected = { selectedAction = it }
-        )
-        requiredField(show = pointActionRequired)
-        space(h = 25)
-        updatePointsButton(
-            traineeNameRequired,
-            pointsRequired,
-            pointActionRequired,
-            traineeId,
-            points2,
-            selectedAction,
-            onItemSelected = { selectedAction = it },
-            points,
-            searchedTrainee,
-            showSending,
-            shutDownError,
-            errorMessage
-        )
-        if (showSending.value) {
-            Text(
-                text = "Sending....",
-                color = Color.White,
-                textAlign = TextAlign.Center
+            errorDialog(
+                shutDown = shutDownError,
+                errorMessage = errorMessage
             )
+            if (points.value != "")
+                points2.value = points.value.toInt()
+            Text(
+                text = "Extra Points",
+                fontSize = 30.sp,
+                fontFamily = FontFamily(Font(R.font.bold2)),
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 30.dp)
+            )
+            space(h = 30)
+            search(searchedTrainee, traineeId)
+            requiredField(show = traineeNameRequired)
+            space(h = 50)
+            pointsField(points = points)
+            requiredField(show = pointsRequired)
+            space(h = 50)
+            selectPointAction(
+                itemList = pointType,
+                selectedItem = selectedAction,
+                onItemSelected = { selectedAction = it }
+            )
+            requiredField(show = pointActionRequired)
+            space(h = 25)
+            updatePointsButton(
+                traineeNameRequired,
+                pointsRequired,
+                pointActionRequired,
+                traineeId,
+                points2,
+                selectedAction,
+                onItemSelected = { selectedAction = it },
+                points,
+                searchedTrainee,
+                showSending,
+                shutDownError,
+                errorMessage
+            )
+            if (showSending.value) {
+                Text(
+                    text = "Sending....",
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .padding(10.dp),
+            contentAlignment = Alignment.TopStart
+        ){
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                tint = Color.White,
+                contentDescription = null,
+                modifier = Modifier.clickable {
+                    navController.popBackStack()
+                }.padding(5.dp)
+            )
+
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

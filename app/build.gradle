@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.gms.google-services'
+   // id 'com.google.gms.google-services'
 }
 
 android {
@@ -99,4 +99,6 @@ dependencies {
 
     // Zxing
     implementation 'com.google.zxing:core:3.3.3'
+
+    implementation "com.google.accompanist:accompanist-insets:0.28.0"
 }

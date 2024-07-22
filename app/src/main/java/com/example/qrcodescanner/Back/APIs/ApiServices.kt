@@ -19,7 +19,7 @@ interface ApiServices {
     fun addTraineeToAttendance(
         @Body traineeId: AddTraineeRequirements,
         @Header("Authorization") token: String
-    ): Call<ApiResponse>
+    ): Call<AttendanceResponse>
 
 
     @GET("Mobile/getPresentTrainees")

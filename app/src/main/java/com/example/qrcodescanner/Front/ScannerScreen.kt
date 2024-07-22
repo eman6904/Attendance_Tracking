@@ -1,18 +1,12 @@
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Vibrator
 import android.util.Log
 import android.graphics.Rect
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Switch
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -20,7 +14,6 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,9 +27,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
+import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -45,17 +36,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ComponentActivity
 import androidx.navigation.NavHostController
+import com.example.qrcodescanner.Back.DataClasses.AddTraineeRequirements
+import com.example.qrcodescanner.Back.functions.addTraineeToAttendance
 import com.example.qrcodescanner.Back.functions.errorDialog
-import com.example.qrcodescanner.Front.validation
+import com.example.qrcodescanner.Back.functions.getCurrentCamp
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.ScreensRoute
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -69,12 +56,17 @@ fun QrScannerScreen(navController: NavHostController) {
     errorDialog(shutDownError, errorMessage)
 
     if (barcodeValue.value.isNotEmpty()) {
-        validation(
-            barcodeValue = barcodeValue,
-            navController = navController,
-            shutDownError = shutDownError,
-            errorMessage = errorMessage
-        )
+        LaunchedEffect(Unit) {
+            addTraineeToAttendance(
+                traineeRequirements = AddTraineeRequirements(
+                    barcodeValue.value,
+                    getCurrentCamp()!!.id
+                ),
+                navController=navController,
+                errorMessage = errorMessage,
+                shutDownError = shutDownError,
+            )
+        }
     }
     Box(
         modifier = Modifier

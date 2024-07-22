@@ -46,14 +46,11 @@ fun newPassword(
     email: String,
     token: String
 ) {
-    Log.d("email", email)
-    Log.d("token", token)
+
     val confirmPassword = rememberSaveable() { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     var emptyPassword = rememberSaveable() { mutableStateOf(false) }
-    var notEmptyPass = rememberSaveable() { mutableStateOf(false) }
     var emptyConfirmPassword = rememberSaveable() { mutableStateOf(false) }
-    var notEmptyConfirmPass = rememberSaveable() { mutableStateOf(false) }
     var showProgress = rememberSaveable() { mutableStateOf(false) }
     var notSame = rememberSaveable() { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }

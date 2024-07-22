@@ -9,4 +9,5 @@ sealed class ScreensRoute(val route:String){
     object OTPCodeScreen: ScreensRoute(route="otpCode")
     object NewPasswordScreen: ScreensRoute(route="newPassword")
     object ScannerScreen: ScreensRoute(route="scannerScreen")
+    object TraineeScreen: ScreensRoute(route="traineeScreen")
 }
