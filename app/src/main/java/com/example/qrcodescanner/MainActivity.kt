@@ -9,11 +9,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
-import com.example.qrcodescanner.Back.APIs.ApiConnection
-import com.example.qrcodescanner.Back.functions.getCurrentDate
-import com.example.qrcodescanner.Back.functions.getMode
-import com.example.qrcodescanner.Front.login2
-import com.example.qrcodescanner.ui.theme.ICPCTheme
+import com.example.qrcodescanner.back.API.ApiConnection
+import com.example.qrcodescanner.back.function.getCurrentDate
+import com.example.qrcodescanner.back.function.getMode
+import com.example.qrcodescanner.navigation.appNavGraph
+import com.example.qrcodescanner.front.theme.ICPCTheme
 
 
 class MainActivity : ComponentActivity() {
