@@ -116,7 +116,7 @@ fun screenBody(
                 AsyncImage(
                     modifier = Modifier.fillMaxSize(),
                     model = traineeItems.data.imageUrl,
-                    contentScale = ContentScale.Inside,
+                    contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
             }

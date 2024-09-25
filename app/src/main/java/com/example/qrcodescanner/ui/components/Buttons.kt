@@ -41,10 +41,8 @@ import com.example.qrcodescanner.ui.utils.checkEmail
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.checkOtp
-import com.example.qrcodescanner.data.apis.forgotPassword
-import com.example.qrcodescanner.data.apis.resetPassword
-import com.example.qrcodescanner.data.apis.traineePointsUpdate
+import com.example.qrcodescanner.data.apis.ViewModel
+
 
 @Composable
 fun mainButtons(
@@ -174,6 +172,7 @@ fun updatePointsButton(
     val isSuccess = remember { mutableStateOf(false) }
     val message = remember { mutableStateOf("") }
     val points_action=stringResource(id = R.string.points_action)
+    val viewModel=ViewModel()
 
     if (message.value.isNotEmpty()) {
         showMessage.value = true
@@ -193,7 +192,7 @@ fun updatePointsButton(
             .clickable {
 
                 if (searchedTrainee.value.isNotEmpty() && pointss.value.isNotEmpty() && pointsAction != points_action) {
-                    traineePointsUpdate(
+                    viewModel.traineePointsUpdate(
                         extraPoint = ExtraPointRequirements(traineeId.value, points.value),
                         isSuccess = isSuccess,
                         message = message,
@@ -248,6 +247,7 @@ fun sendOtpCodeButton(
     val shutDown = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val context= LocalContext.current
+    val viewModel=ViewModel()
 
     if (message.value.isNotEmpty()) {
         shutDown.value = true
@@ -267,7 +267,7 @@ fun sendOtpCodeButton(
         onClick = {
             keyboardController?.hide()
             if (!checkEmail(email=email,isEmailError=isEmailError,emailError=emailError,context)) {
-                forgotPassword(
+                viewModel.forgotPassword(
                     email.value,
                     isSuccess,
                     message,
@@ -314,6 +314,7 @@ fun resetPasswordButton(
     val shutDown = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val context= LocalContext.current
+    val viewModel=ViewModel()
 
     if (message.value.isNotEmpty()) {
         shutDown.value = true
@@ -338,7 +339,7 @@ fun resetPasswordButton(
             val checkConfirmPasswordResult= checkConfirmPassword(confirmPassword = confirmPassword, password = password, isConfirmPassError = isConfirmPasswordError,
                 confirmPassError = confirmPasswordError,context=context)
             if (!checkPasswordResult&&!checkConfirmPasswordResult) {
-                resetPassword(
+               viewModel. resetPassword(
                     PasswordResetRequirements(
                         password.value,
                         token,
@@ -385,6 +386,7 @@ fun confirmOtpCodeButton(
     val isSuccess = remember { mutableStateOf(false) }
     val shutDown = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val viewModel=ViewModel()
 
     if (message.value.isNotEmpty()) {
         shutDown.value = true
@@ -405,7 +407,7 @@ fun confirmOtpCodeButton(
 
             keyboardController?.hide()
             calcOtpNumber(otpDigits, otpNumber)
-            checkOtp(
+            viewModel.checkOtp(
                 email,
                 otpNumber.value,
                 isSuccess,

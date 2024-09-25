@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.getPresentTrainees
+import com.example.qrcodescanner.data.apis.ViewModel
 import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.getMode
 import com.example.qrcodescanner.ui.components.AttendanceTopBar
@@ -45,6 +45,7 @@ fun AttendanceScreen(navController: NavHostController) {
     val selectedTrainee = remember { mutableStateOf("") }
     var isRefreshing =remember { mutableStateOf(false) }
     val presentTraineeList = remember { mutableStateListOf<ItemData>() }
+    val viewModel= ViewModel()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing.value)
 
         LaunchedEffect(isRefreshing.value,selectedTrainee.value)
@@ -54,7 +55,7 @@ fun AttendanceScreen(navController: NavHostController) {
                 showProgress.value = false
             else if(presentTraineeList.isEmpty())
                 showProgress.value=true
-            getPresentTrainees(
+            viewModel.getPresentTrainees(
                 trainees = presentTraineeList,
                 itemsCase = itemsCase,
                 showProgress = showProgress,

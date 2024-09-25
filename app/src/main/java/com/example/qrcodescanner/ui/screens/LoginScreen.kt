@@ -42,7 +42,7 @@ import com.example.qrcodescanner.ui.components.space
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.ui.utils.checkUserName
 import com.example.qrcodescanner.MainActivity
-import com.example.qrcodescanner.data.apis.login
+import com.example.qrcodescanner.data.apis.ViewModel
 import com.example.qrcodescanner.ui.components.errorDialog
 import kotlinx.coroutines.launch
 
@@ -180,6 +180,7 @@ fun mainContent(
     val userNameError = remember { mutableStateOf("") }
     val showProgress = remember { mutableStateOf(false) }
     val scop = rememberCoroutineScope()
+    val viewModel= ViewModel()
     val rememberMe = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
     val userData = remember {
         mutableStateOf(
@@ -274,7 +275,7 @@ fun mainContent(
                     )
                     if (!checkPasswordResult && !checkUserNameResult) {
                         scop.launch {
-                            login(
+                           viewModel.login(
                                 loginData = LoginRequirements(
                                     userName = userName.value,
                                     password = password.value

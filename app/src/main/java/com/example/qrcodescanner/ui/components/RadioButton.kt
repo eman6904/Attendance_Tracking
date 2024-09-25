@@ -32,7 +32,7 @@ import com.example.qrcodescanner.data.utils.getCurrentCamp
 import com.example.qrcodescanner.MainActivity.Companion.SELECTED_CAMPP
 import com.example.qrcodescanner.MainActivity.Companion.selectedCamp_sharedPref
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.getCamps
+import com.example.qrcodescanner.data.apis.ViewModel
 import com.example.qrcodescanner.ui.screens.sadNews
 import com.google.gson.Gson
 
@@ -49,6 +49,7 @@ fun selectCamp(
     val gson = Gson()
     val errorMessage = remember { mutableStateOf("") }
     val shutDownError = remember { mutableStateOf(false) }
+    val viewModel= ViewModel()
 
     if (camps.isEmpty() && itemsCase.value.isEmpty())
         showProgressBar.value = true
@@ -56,7 +57,7 @@ fun selectCamp(
         showProgressBar.value = false
 
     LaunchedEffect(Unit) {
-        getCamps(
+        viewModel.getCamps(
             camps = camps,
             itemsCase = itemsCase,
             showProgress = showProgressBar,

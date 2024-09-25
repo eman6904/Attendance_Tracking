@@ -40,7 +40,7 @@ import com.example.qrcodescanner.data.model.AttendanceRegistrationRequirements
 import com.example.qrcodescanner.data.utils.getCurrentCamp
 import com.example.qrcodescanner.ui.components.rejectedTrainee
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.addTraineeToAttendance
+import com.example.qrcodescanner.data.apis.ViewModel
 import com.example.qrcodescanner.ui.components.scannerErrorDialog
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.google.common.util.concurrent.ListenableFuture
@@ -56,6 +56,7 @@ fun QrScannerScreen(navController: NavHostController) {
     val shutDownError = remember { mutableStateOf(false) }
     val shutDownFailedDialog = remember { mutableStateOf(false) }
     val showProgress = remember { mutableStateOf(false) }
+    val viewModel= ViewModel()
     scannerErrorDialog(shutDownError, errorMessage,showProgress,barcodeValue)
 
     if (shutDownFailedDialog.value) {
@@ -70,7 +71,7 @@ fun QrScannerScreen(navController: NavHostController) {
 
         LaunchedEffect(Unit) {
             showProgress.value=true
-            addTraineeToAttendance(
+            viewModel.addTraineeToAttendance(
                 traineeRequirements = AttendanceRegistrationRequirements(
                     barcodeValue.value,
                     getCurrentCamp()!!.id

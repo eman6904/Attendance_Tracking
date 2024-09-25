@@ -30,7 +30,7 @@ import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.normalizeText
 import com.example.qrcodescanner.ui.screens.traineeModel
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.getAllTrainees
+import com.example.qrcodescanner.data.apis.ViewModel
 import com.example.qrcodescanner.ui.screens.sadNews
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -49,6 +49,7 @@ fun searchAboutTraineeForUpdatePoints(
     val notrainees = remember { mutableStateOf(false) }
     var active = remember { mutableStateOf(false) }
     var isRefreshing = remember { mutableStateOf(false) }
+    val viewModel= ViewModel()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing.value)
 
 
@@ -59,7 +60,7 @@ fun searchAboutTraineeForUpdatePoints(
         else if (trainees.isEmpty())
             showProgress.value = true
 
-        getAllTrainees(
+        viewModel.getAllTrainees(
             trainees = trainees,
             shutDownError = shutDownError,
             errorMessage = errorMessage,
