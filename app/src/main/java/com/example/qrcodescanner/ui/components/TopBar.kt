@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.data.utils.getCurrentCamp
-import com.example.qrcodescanner.ui.screens.searchAboutTrainee
+//import com.example.qrcodescanner.ui.screens.searchAboutTrainee
 import com.example.qrcodescanner.R
 
 @Composable
@@ -82,7 +82,7 @@ fun AttendanceTopBar(
                    .fillMaxSize(),
                contentAlignment = Alignment.TopCenter
            ) {
-               searchAboutTrainee(selectedTrainee = selectedTrainee)
+              // searchAboutTrainee(selectedTrainee = selectedTrainee)
            }
 
        }

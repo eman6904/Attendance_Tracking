@@ -1,6 +1,7 @@
 package com.example.qrcodescanner.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,8 +43,11 @@ import com.example.qrcodescanner.ui.components.space
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.ui.utils.checkUserName
 import com.example.qrcodescanner.MainActivity
+import com.example.qrcodescanner.data.apis.LoadingState
 import com.example.qrcodescanner.data.apis.ViewModel
+import com.example.qrcodescanner.data.model.LoginResponse
 import com.example.qrcodescanner.ui.components.errorDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -190,6 +194,25 @@ fun mainContent(
             )
         )
     }
+      LaunchedEffect(Unit){
+
+          viewModel.login(
+              loginRequirements = LoginRequirements(
+                  userName = userName.value,
+                  password = password.value
+              ))
+
+      }
+
+    val loginState by viewModel.state.collectAsState()
+
+        when(loginState){
+            is LoadingState.Loading-> Log.d("loading","loading....")
+            is LoadingState.Error-> Log.d("error","error....")
+            is LoadingState.Success-> Log.d("success",((loginState as LoadingState.Success<LoginResponse>).data.data?.token).toString())
+            else ->Log.d("hhh",viewModel.state.value.toString())
+        }
+
 
     LaunchedEffect(key1 = Unit) {
 
@@ -275,17 +298,11 @@ fun mainContent(
                     )
                     if (!checkPasswordResult && !checkUserNameResult) {
                         scop.launch {
-                           viewModel.login(
-                                loginData = LoginRequirements(
+                            viewModel.login(
+                                loginRequirements = LoginRequirements(
                                     userName = userName.value,
                                     password = password.value
-                                ),
-                                userData = userData,
-                                navController = navController,
-                                shutDownError = shutDownError,
-                                errorMessage = errorMessage,
-                                showProgress = showProgress
-                            )
+                                ))
                         }
                         showProgress.value = true
                     }
