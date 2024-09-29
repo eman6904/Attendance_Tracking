@@ -10,6 +10,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.example.qrcodescanner.data.apis.ApiConnection
+import com.example.qrcodescanner.data.apis.ApiViewModel
+import com.example.qrcodescanner.data.apis.ViewModelHelper
 import com.example.qrcodescanner.data.utils.getCurrentDate
 import com.example.qrcodescanner.data.utils.getMode
 import com.example.qrcodescanner.navigation.appNavGraph
@@ -36,6 +38,8 @@ class MainActivity : ComponentActivity() {
         lateinit var mode_sharedPref: SharedPreferences
         val connect = ApiConnection()
         lateinit var token: String
+       lateinit var  apiViewModel:ApiViewModel
+       lateinit var  viewModelHelper:ViewModelHelper
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +51,8 @@ class MainActivity : ComponentActivity() {
         rememberMe_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         userData_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         mode_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        apiViewModel=ApiViewModel()
+        viewModelHelper=ViewModelHelper()
 
         setContent {
 

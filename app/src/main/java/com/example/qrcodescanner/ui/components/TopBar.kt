@@ -28,11 +28,11 @@ import androidx.navigation.NavHostController
 import com.example.qrcodescanner.data.utils.getCurrentCamp
 //import com.example.qrcodescanner.ui.screens.searchAboutTrainee
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.ui.screens.searchAboutTrainee
 
 @Composable
 fun AttendanceTopBar(
     navController: NavHostController,
-    selectedTrainee: MutableState<String>
 ) {
 
     Card(
@@ -82,7 +82,7 @@ fun AttendanceTopBar(
                    .fillMaxSize(),
                contentAlignment = Alignment.TopCenter
            ) {
-              // searchAboutTrainee(selectedTrainee = selectedTrainee)
+               searchAboutTrainee()
            }
 
        }

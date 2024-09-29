@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,17 +31,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.R
 
 @Composable
 fun selectPointAction(
     itemList: List<String>,
-    selectedItem: String,
-    onItemSelected: (selectedItem: String) -> Unit,
-    // through that we can change value of selectedItem,
-
 ) {
     var expanded by rememberSaveable() { mutableStateOf(false) }
+    val selectedAction=viewModelHelper.pointAction.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,13 +55,13 @@ fun selectPointAction(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (selectedItem == stringResource(id = R.string.plus)) {
+                if (selectedAction.value == stringResource(id = R.string.plus)) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = null,
                         tint = Color.Green
                     )
-                } else if (selectedItem == stringResource(id = R.string.minus)) {
+                } else if (selectedAction.value == stringResource(id = R.string.minus)) {
                     Icon(
                         imageVector = Icons.Default.Remove,
                         contentDescription = null,
@@ -70,12 +69,11 @@ fun selectPointAction(
                     )
                 }
                 Text(
-                    text = selectedItem,
+                    text = selectedAction.value,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
                         .weight(8f),
-                    fontFamily = FontFamily.Default,
                     fontSize = 15.sp
                 )
                 Icon(
@@ -90,14 +88,12 @@ fun selectPointAction(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            //to control dropDownMenu position
-            // offset = DpOffset(x = (-1).dp, y = (-250).dp)
         ) {
             itemList.forEach {
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
-                        onItemSelected(it)
+                       viewModelHelper.setAction(it)
                     }
                 ) {
                     Row(

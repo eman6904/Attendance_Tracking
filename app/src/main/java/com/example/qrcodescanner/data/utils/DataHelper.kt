@@ -10,6 +10,7 @@ import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.data.model.*
 import com.example.qrcodescanner.MainActivity.Companion.REMEMBER_ME
 import com.example.qrcodescanner.MainActivity.Companion.rememberMe_sharedPref
+import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +29,8 @@ fun logout(
 ) {
     try {
         rememberMe_sharedPref.edit().putString(REMEMBER_ME, null).apply()
+        viewModelHelper.setPassword("")
+        viewModelHelper.setUserName("")
         navController.navigate(ScreensRoute.LogInScreen.route) {
             popUpTo(navController.graph.startDestinationId) {
                 inclusive = true

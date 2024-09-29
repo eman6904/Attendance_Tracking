@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.data.utils.getCurrentUser
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.R
@@ -160,11 +161,16 @@ fun updatePointsResponse(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
+                        val pointsAction=stringResource(id = R.string.points_action)
                         if (isSuccess.value) {
                             Button(
                                 onClick = {
                                     showMessage.value = false
                                     message.value = ""
+                                    viewModelHelper.setAction(pointsAction)
+                                    viewModelHelper.setPointsString("")
+                                   viewModelHelper.settTrainee("")
+                                   viewModelHelper.setPoint(0)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = colorResource(id = R.color.mainColor),
@@ -181,6 +187,10 @@ fun updatePointsResponse(
                         } else {
                             Button(
                                 onClick = {
+                                    viewModelHelper.setAction(pointsAction)
+                                    viewModelHelper.setPointsString("")
+                                    viewModelHelper.settTrainee("")
+                                    viewModelHelper.setPoint(0)
                                     showMessage.value = false
                                     message.value = ""
                                 },

@@ -7,48 +7,48 @@ import retrofit2.http.*
 
 interface ApiServices {
     @GET("Mobile/getTraineesByCampId/{campId}")
-   suspend fun getTraineesByCampId(
+    fun getTraineesByCampId(
         @Path("campId") campId: Int,
         @Header("Authorization") token: String
-    ): Response<ApiResponse>
+    ): Call<ApiResponse>
 
 
     @GET("Mobile/getCamps")
-    suspend fun getAllCamps(@Header("Authorization") token: String): Response<ApiResponse>
+     fun getAllCamps(@Header("Authorization") token: String): Call<ApiResponse>
 
     @POST("Mobile/addTraineeToAttendence")
-    suspend fun addTraineeToAttendance(
+     fun addTraineeToAttendance(
         @Body traineeId: AttendanceRegistrationRequirements,
         @Header("Authorization") token: String
-    ): Response<AttendanceRegistrationResponse>
+    ): Call<AttendanceRegistrationResponse>
 
 
     @GET("Mobile/getPresentTrainees")
-    suspend fun getPresentTrainees(
+     fun getPresentTrainees(
         @Query("campId") campId: Int,
         @Query("currentDate")currentDate:String,
         @Query("keyWord")keyWord:String,
         @Header("Authorization") token: String
-    ): Response<ApiResponse>
+    ): Call<ApiResponse>
 
 
     @PUT("Mobile/updateTraineePoints")
-   suspend fun traineePointsUpdate(
+    fun traineePointsUpdate(
         @Body extraPoint: ExtraPointRequirements,
         @Header("Authorization") token: String
-    ): Response<ApiResponse>
+    ): Call<ApiResponse>
 
     @POST("Auth/mobile-login")
-    suspend fun login(
+     fun login(
         @Body loginData: LoginRequirements,
-    ): Response<LoginResponse>
+    ): Call<LoginResponse>
 
     @POST("Auth/forget-password")
-   suspend fun forgetPassword(@Query("email")email:String):Response<PasswordResetResponse>
+    fun forgetPassword(@Query("email")email:String):Call<PasswordResetResponse>
 
     @GET("Auth/checkResetOtp")
-    suspend fun checkOtp(@Query("Email")email:String, @Query("Otp")otp:Int):Response<PasswordResetResponse>
+    fun checkOtp(@Query("Email")email:String, @Query("Otp")otp:Int):Call<PasswordResetResponse>
 
     @POST("Auth/reset-password")
-   suspend fun resetPassword(@Body resetPassword:PasswordResetRequirements):Response<PasswordResetResponse>
+    fun resetPassword(@Body resetPassword:PasswordResetRequirements):Call<PasswordResetResponse>
 }

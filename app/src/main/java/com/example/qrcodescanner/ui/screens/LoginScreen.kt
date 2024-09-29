@@ -37,17 +37,17 @@ import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.data.model.LoginRequirements
 import com.example.qrcodescanner.data.model.UserData
 import com.example.qrcodescanner.data.utils.*
-import com.example.qrcodescanner.ui.components.AuthTextField
 import com.example.qrcodescanner.ui.components.checkBox
 import com.example.qrcodescanner.ui.components.space
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.ui.utils.checkUserName
 import com.example.qrcodescanner.MainActivity
-import com.example.qrcodescanner.data.apis.LoadingState
-import com.example.qrcodescanner.data.apis.ViewModel
-import com.example.qrcodescanner.data.model.LoginResponse
+import com.example.qrcodescanner.MainActivity.Companion.apiViewModel
+import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
+import com.example.qrcodescanner.data.apis.ViewModelHelper
+import com.example.qrcodescanner.ui.components.PasswordTextField
+import com.example.qrcodescanner.ui.components.UserNameTextField
 import com.example.qrcodescanner.ui.components.errorDialog
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,6 +55,17 @@ fun LoginScreen(navController: NavHostController) {
 
 
     val scrollState = rememberScrollState()
+    LaunchedEffect(Unit){
+        val rememberMe = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
+
+
+        if (rememberMe.toString() == "true" && getLoginData() != null) {
+
+            viewModelHelper.setUserName(getLoginData()!!.userName)
+            viewModelHelper.setPassword(getLoginData()!!.password)
+
+        }
+    }
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +125,7 @@ fun headerSection() {
             .fillMaxSize()
             .background(colorResource(id = R.color.mainColor))
     ) {
-        space(30)
+        //space(30)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -176,16 +187,15 @@ fun mainContent(
     navController: NavHostController,
 ) {
 
-    val userName = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
+    val password= viewModelHelper.password.collectAsState()
+    val userName= viewModelHelper.userName.collectAsState()
     var isUserNameError = remember() { mutableStateOf(false) }
     val isPasswordError = remember { mutableStateOf(false) }
     val passError = remember { mutableStateOf("") }
     val userNameError = remember { mutableStateOf("") }
     val showProgress = remember { mutableStateOf(false) }
     val scop = rememberCoroutineScope()
-    val viewModel= ViewModel()
-    val rememberMe = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
+
     val userData = remember {
         mutableStateOf(
             UserData(
@@ -193,34 +203,6 @@ fun mainContent(
                 "", emptyList(), "", ""
             )
         )
-    }
-      LaunchedEffect(Unit){
-
-          viewModel.login(
-              loginRequirements = LoginRequirements(
-                  userName = userName.value,
-                  password = password.value
-              ))
-
-      }
-
-    val loginState by viewModel.state.collectAsState()
-
-        when(loginState){
-            is LoadingState.Loading-> Log.d("loading","loading....")
-            is LoadingState.Error-> Log.d("error","error....")
-            is LoadingState.Success-> Log.d("success",((loginState as LoadingState.Success<LoginResponse>).data.data?.token).toString())
-            else ->Log.d("hhh",viewModel.state.value.toString())
-        }
-
-
-    LaunchedEffect(key1 = Unit) {
-
-        if (rememberMe.toString() == "true" && getLoginData() != null) {
-
-            userName.value = getLoginData()!!.userName
-            password.value = getLoginData()!!.password
-        }
     }
 
     Column(
@@ -233,9 +215,8 @@ fun mainContent(
         ) {
 
         space(40)
-        AuthTextField(
+        UserNameTextField(
             placeHolder = stringResource(R.string.user_name),
-            textFieldValue = userName,
             isError = isUserNameError,
             errorValue = userNameError,
             leadingIcon = {
@@ -250,12 +231,11 @@ fun mainContent(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp)
+                .padding(start = 20.dp, end = 20.dp),
         )
         space(h = 25)
-        AuthTextField(
+        PasswordTextField(
             placeHolder = stringResource(R.string.password),
-            textFieldValue = password,
             isError = isPasswordError,
             errorValue = passError,
             leadingIcon = {
@@ -270,7 +250,7 @@ fun mainContent(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp)
+                .padding(start = 20.dp, end = 20.dp),
         )
         space(h = 20)
         Column(
@@ -285,24 +265,30 @@ fun mainContent(
 
                     keyboardController?.hide()
                     val checkUserNameResult = checkUserName(
-                        userName = userName,
+                        userName = userName.value,
                         isUserNameError = isUserNameError,
                         userNameError = userNameError,
                         context
                     )
                     val checkPasswordResult = checkPassword(
-                        password = password,
+                        password = password.value,
                         isPassError = isPasswordError,
                         passError = passError,
                         context
                     )
                     if (!checkPasswordResult && !checkUserNameResult) {
                         scop.launch {
-                            viewModel.login(
-                                loginRequirements = LoginRequirements(
+                            apiViewModel.login(
+                                loginData = LoginRequirements(
                                     userName = userName.value,
                                     password = password.value
-                                ))
+                                ),
+                                userData = userData,
+                                navController = navController,
+                                shutDownError = shutDownError,
+                                errorMessage = errorMessage,
+                                showProgress = showProgress
+                            )
                         }
                         showProgress.value = true
                     }

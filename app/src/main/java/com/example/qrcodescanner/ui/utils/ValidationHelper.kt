@@ -12,17 +12,17 @@ fun isDigitsOnly(text: String): Boolean {
 }
 
 fun checkEmail(
-    email: MutableState<String>,
+    email: String,
     isEmailError: MutableState<Boolean>,
     emailError: MutableState<String>,
     context: Context
 ): Boolean {
 
-    if (email.value.isEmpty()) {
+    if (email.isEmpty()) {
 
         isEmailError.value = true
         emailError.value = context.getString(R.string.enter_e_mail)
-    } else if (!email.value.isEmail()) {
+    } else if (!email.isEmail()) {
 
         isEmailError.value = true
         emailError.value = context.getString(R.string.invalid_email)
@@ -35,13 +35,13 @@ fun checkEmail(
 }
 
 fun checkPassword(
-    password: MutableState<String>,
+    password: String,
     isPassError: MutableState<Boolean>,
     passError: MutableState<String>,
     context: Context
 ): Boolean {
 
-    if (password.value.isEmpty()) {
+    if (password.isEmpty()) {
 
         isPassError.value = true
         passError.value = context.getString(R.string.enter_your_password)
@@ -54,13 +54,13 @@ fun checkPassword(
 }
 
 fun checkUserName(
-    userName: MutableState<String>,
+    userName: String,
     isUserNameError: MutableState<Boolean>,
     userNameError: MutableState<String>,
     context: Context
 ): Boolean {
 
-    if (userName.value.isEmpty()) {
+    if (userName.isEmpty()) {
 
         isUserNameError.value = true
         userNameError.value = context.getString(R.string.enter_your_user_name)
@@ -73,18 +73,18 @@ fun checkUserName(
 }
 
 fun checkConfirmPassword(
-    password: MutableState<String>,
-    confirmPassword: MutableState<String>,
+    password: String,
+    confirmPassword: String,
     isConfirmPassError: MutableState<Boolean>,
     confirmPassError: MutableState<String>,
     context: Context
 ): Boolean {
 
-    if (confirmPassword.value.isEmpty()) {
+    if (confirmPassword.isEmpty()) {
 
         isConfirmPassError.value = true
         confirmPassError.value = context.getString(R.string.enter_new_password_again)
-    } else if (password.value != confirmPassword.value) {
+    } else if (password != confirmPassword) {
 
         isConfirmPassError.value = true
         confirmPassError.value = context.getString(R.string.password_doesn_t_match)
@@ -97,7 +97,7 @@ fun checkConfirmPassword(
 }
 
 fun checkPoints(
-    isInvalid: MutableState<Boolean>,
+    isValid: MutableState<Boolean>,
     error: MutableState<String>,
     points: String,
     context: Context
@@ -105,25 +105,24 @@ fun checkPoints(
 
     val largePoints = 92233720368547758
 
-    when (isDigitsOnly(points)) {
+        when (isDigitsOnly(points)) {
 
-        true -> {
+            true -> {
 
-            if (points.toLong() <= largePoints) {
-                isInvalid.value = false
-                error.value = ""
-            } else {
+                if (points.toLong() <= largePoints) {
+                    isValid.value = false
+                    error.value = ""
+                } else {
 
-                isInvalid.value = true
-                error.value = context.getString(R.string.the_number_is_too_large)
+                    isValid.value = true
+                    error.value = context.getString(R.string.the_number_is_too_large)
+                }
+            }
+
+            false -> {
+                isValid.value = true
+                error.value = context.getString(R.string.points_must_contain_only_digits)
             }
         }
-
-        false -> {
-            isInvalid.value = true
-            error.value = context.getString(R.string.points_must_contain_only_digits)
-        }
-    }
-
-    return isInvalid.value
+    return isValid.value
 }
