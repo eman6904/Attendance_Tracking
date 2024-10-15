@@ -16,7 +16,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +27,7 @@ import androidx.navigation.NavHostController
 import com.example.qrcodescanner.data.utils.getCurrentCamp
 //import com.example.qrcodescanner.ui.screens.searchAboutTrainee
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.ui.screens.searchAboutTrainee
+import com.example.qrcodescanner.ui.screens.trainee.searchAboutTrainee
 
 @Composable
 fun AttendanceTopBar(

@@ -11,4 +11,5 @@ sealed class ScreensRoute(val route:String){
     object ScannerScreen: ScreensRoute(route="scannerScreen")
     object TraineeScreen: ScreensRoute(route="traineeScreen")
     object SplashScreen: ScreensRoute(route="splashScreen")
+
 }

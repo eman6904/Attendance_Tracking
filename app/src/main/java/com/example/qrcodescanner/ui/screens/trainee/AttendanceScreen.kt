@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.trainee
 
 
 import androidx.compose.foundation.Image
@@ -23,11 +23,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.qrcodescanner.MainActivity.Companion.apiViewModel
+import com.example.qrcodescanner.MainActivity.Companion.apiViewModel2
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.ApiViewModel
-import com.example.qrcodescanner.data.apis.ViewModelHelper
 import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.getMode
 import com.example.qrcodescanner.ui.components.AttendanceTopBar
@@ -57,13 +55,14 @@ fun AttendanceScreen(navController: NavHostController) {
             showProgress.value = false
         else if(presentTraineeList.isEmpty())
             showProgress.value=true
-        apiViewModel.getPresentTrainees(
+        apiViewModel2.getPresentTrainees(
             trainees = presentTraineeList,
             itemsCase = itemsCase,
             showProgress = showProgress,
             shutDownError = shutDownError,
             errorMessage = errorMessage,
-            selectedTrainee = selectedTrainee.value
+            selectedTrainee = selectedTrainee.value,
+            navController = navController
         )
         kotlinx.coroutines.delay(2000)
         isRefreshing.value= false
@@ -279,7 +278,8 @@ fun sadNews(
             space(10)
             Text(
                 text=message.value,
-                color=MaterialTheme.colors.onSurface
+                color=MaterialTheme.colors.onSurface,
+                modifier = Modifier.padding(20.dp)
             )
         }
 

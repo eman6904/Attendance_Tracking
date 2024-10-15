@@ -1,6 +1,5 @@
 package com.example.qrcodescanner.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -34,18 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import com.example.qrcodescanner.MainActivity.Companion.apiViewModel
+import com.example.qrcodescanner.MainActivity.Companion.apiViewModel2
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.data.model.ExtraPointRequirements
 import com.example.qrcodescanner.data.model.PasswordResetRequirements
 import com.example.qrcodescanner.data.utils.getCurrentCamp
-import com.example.qrcodescanner.ui.screens.calcOtpNumber
+import com.example.qrcodescanner.ui.screens.auth.calcOtpNumber
 import com.example.qrcodescanner.ui.utils.checkConfirmPassword
 import com.example.qrcodescanner.ui.utils.checkEmail
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.ApiViewModel
+import com.example.qrcodescanner.data.apis.ViewModel2
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.CampsViewModel
 
 
 @Composable
@@ -53,7 +53,8 @@ fun mainButtons(
     btnName: String,
     navController: NavHostController,
     showReminder: MutableState<Boolean>,
-    currentCampName: MutableState<String>
+    currentCampName: MutableState<String>,
+    viewModel: CampsViewModel
 ) {
 
     var selectCampDialog = remember { mutableStateOf(false) }
@@ -84,7 +85,12 @@ fun mainButtons(
                             fontFamily = FontFamily(Font(R.font.bold2))
                         )
                     }
-                    selectCamp(selectCampDialog, currentCampName)
+                    selectCamp(
+                       selectCampDialog =  selectCampDialog,
+                        currentCampName = currentCampName,
+                        navController =   navController,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -163,6 +169,7 @@ fun updatePointsButton(
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
     pointsError: MutableState<String>,
+    navController: NavHostController
 ) {
 
     val points= viewModelHelper.traineePoints.collectAsState()
@@ -191,12 +198,13 @@ fun updatePointsButton(
         modifier = Modifier
             .clickable {
                 if (searchedTrainee.value.isNotEmpty() && pointsString.value.isNotEmpty() && pointsAction.value != points_action) {
-                    apiViewModel.traineePointsUpdate(
+                    apiViewModel2.traineePointsUpdate(
                         extraPoint = ExtraPointRequirements(traineeId.value, points.value),
                         isSuccess = isSuccess,
                         message = message,
                         shutDownError = shutDownError,
-                        errorMessage = errorMessage
+                        errorMessage = errorMessage,
+                        navController = navController
                     )
                     showSending.value = true
 
@@ -267,7 +275,7 @@ fun sendOtpCodeButton(
         onClick = {
             keyboardController?.hide()
             if (!checkEmail(email=email.value,isEmailError=isEmailError,emailError=emailError,context)) {
-                apiViewModel.forgotPassword(
+                apiViewModel2.forgotPassword(
                     email.value,
                     isSuccess,
                     message,
@@ -338,7 +346,7 @@ fun resetPasswordButton(
             val checkConfirmPasswordResult= checkConfirmPassword(confirmPassword = passConfirm.value, password = password.value, isConfirmPassError = isConfirmPasswordError,
                 confirmPassError = confirmPasswordError,context=context)
             if (!checkPasswordResult&&!checkConfirmPasswordResult) {
-                apiViewModel. resetPassword(
+                apiViewModel2. resetPassword(
                     PasswordResetRequirements(
                         password.value,
                         token,
@@ -385,7 +393,7 @@ fun confirmOtpCodeButton(
     val isSuccess = remember { mutableStateOf(false) }
     val shutDown = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val viewModel=ApiViewModel()
+    val viewModel2=ViewModel2()
 
     if (message.value.isNotEmpty()) {
         shutDown.value = true
@@ -406,7 +414,7 @@ fun confirmOtpCodeButton(
 
             keyboardController?.hide()
             calcOtpNumber(otpDigits, otpNumber)
-            viewModel.checkOtp(
+            viewModel2.checkOtp(
                 email,
                 otpNumber.value,
                 isSuccess,

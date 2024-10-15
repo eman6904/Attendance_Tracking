@@ -1,5 +1,6 @@
 package com.example.qrcodescanner.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,39 +22,83 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.normalizeText
-import com.example.qrcodescanner.ui.screens.traineeModel
+import com.example.qrcodescanner.ui.screens.trainee.traineeModel
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.ApiViewModel
-import com.example.qrcodescanner.ui.screens.sadNews
+import com.example.qrcodescanner.data.apis.UIState
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.TraineesViewModel
+import com.example.qrcodescanner.navigation.ScreensRoute
+import com.example.qrcodescanner.ui.screens.trainee.sadNews
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun searchAboutTraineeForUpdatePoints(
-    traineeId: MutableState<String>
+    traineeId: MutableState<String>,
+    navController:NavHostController,
+    viewmodel: TraineesViewModel
 ) {
 
     var trainees = remember { mutableListOf<ItemData>() }
     val errorMessage = remember { mutableStateOf("") }
     val shutDownError = remember { mutableStateOf(false) }
     val showProgress = remember { mutableStateOf(false) }
-    val notrainees = remember { mutableStateOf(false) }
+    val noTrainees = remember { mutableStateOf(false) }
     var active = remember { mutableStateOf(false) }
     var isRefreshing = remember { mutableStateOf(false) }
     val searchedTrainee= viewModelHelper.searchedTrainee.collectAsState()
-    val viewModel= ApiViewModel()
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing.value)
+    val state by viewmodel.state.collectAsState()
+    when (state) {
 
+        is UIState.Loading -> {
+
+            if (isRefreshing.value==false)
+                showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (state as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                trainees.clear()
+                noTrainees.value = false
+                val response = (state as UIState.Success).data
+
+                if(response.message=="Unauthorized."){
+                    navController.navigate(ScreensRoute.LogInScreen.route)
+                }else{
+                    if (response.data.isEmpty())
+                        noTrainees.value = true
+                    else
+                        trainees.addAll(response.data)
+                }
+                showProgress.value = false
+                shutDownError.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
 
     LaunchedEffect(isRefreshing.value)
     {
@@ -62,13 +107,7 @@ fun searchAboutTraineeForUpdatePoints(
         else if (trainees.isEmpty())
             showProgress.value = true
 
-        viewModel.getAllTrainees(
-            trainees = trainees,
-            shutDownError = shutDownError,
-            errorMessage = errorMessage,
-            showProgress = showProgress,
-            noTrainee = notrainees
-        )
+        viewmodel.getTrainees()
         kotlinx.coroutines.delay(2000)
         isRefreshing.value = false
     }
@@ -136,7 +175,7 @@ fun searchAboutTraineeForUpdatePoints(
             if (shutDownError.value)
                 sadNews(message = errorMessage)
             else {
-                if (notrainees.value) {
+                if (noTrainees.value) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,

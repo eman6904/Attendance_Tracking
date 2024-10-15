@@ -7,14 +7,14 @@ import retrofit2.http.*
 
 interface ApiServices {
     @GET("Mobile/getTraineesByCampId/{campId}")
-    fun getTraineesByCampId(
+    suspend fun getTraineesByCampId(
         @Path("campId") campId: Int,
         @Header("Authorization") token: String
-    ): Call<ApiResponse>
+    ): Response<ApiResponse>
 
 
     @GET("Mobile/getCamps")
-     fun getAllCamps(@Header("Authorization") token: String): Call<ApiResponse>
+     suspend fun getCamps(@Header("Authorization") token: String): Response<ApiResponse>
 
     @POST("Mobile/addTraineeToAttendence")
      fun addTraineeToAttendance(
@@ -39,9 +39,9 @@ interface ApiServices {
     ): Call<ApiResponse>
 
     @POST("Auth/mobile-login")
-     fun login(
+    suspend fun login(
         @Body loginData: LoginRequirements,
-    ): Call<LoginResponse>
+    ): Response<LoginResponse>
 
     @POST("Auth/forget-password")
     fun forgetPassword(@Query("email")email:String):Call<PasswordResetResponse>

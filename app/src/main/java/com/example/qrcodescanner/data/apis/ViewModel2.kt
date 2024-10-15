@@ -1,33 +1,23 @@
 package com.example.qrcodescanner.data.apis
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.example.qrcodescanner.MainActivity
-import com.example.qrcodescanner.MainActivity.Companion.LOGIN_REQUIREMENTS
 import com.example.qrcodescanner.MainActivity.Companion.connect
 import com.example.qrcodescanner.MainActivity.Companion.token
-import com.example.qrcodescanner.MainActivity.Companion.userData_sharedPref
 import com.example.qrcodescanner.data.model.ApiResponse
 import com.example.qrcodescanner.data.model.AttendanceRegistrationRequirements
 import com.example.qrcodescanner.data.model.AttendanceRegistrationResponse
 import com.example.qrcodescanner.data.model.ExtraPointRequirements
 import com.example.qrcodescanner.data.model.ItemData
-import com.example.qrcodescanner.data.model.LoginRequirements
-import com.example.qrcodescanner.data.model.LoginResponse
 import com.example.qrcodescanner.data.model.PasswordResetRequirements
 import com.example.qrcodescanner.data.model.PasswordResetResponse
-import com.example.qrcodescanner.data.model.UserData
 import com.example.qrcodescanner.data.utils.getCurrentCamp
-import com.example.qrcodescanner.data.utils.getCurrentUser
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -36,65 +26,70 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ApiViewModel:ViewModel(){
+class ViewModel2:ViewModel(){
 
-    fun getAllTrainees(
-        trainees: MutableList<ItemData>,
-        showProgress: MutableState<Boolean>,
-        shutDownError: MutableState<Boolean>,
-        errorMessage: MutableState<String>,
-        noTrainee: MutableState<Boolean>
-    ) {
-
-        val campId = getCurrentCamp()?.id?.toInt()
-        viewModelScope.launch(Dispatchers.IO) {
-
-            try {
-                connect.connect().getTraineesByCampId(campId!!, "Bearer $token")
-                    .enqueue(object : Callback<ApiResponse> {
-                        override fun onResponse(
-                            call: Call<ApiResponse>,
-                            response: Response<ApiResponse>
-                        ) {
-
-                            trainees.clear()
-                            noTrainee.value = false
-                            if (response.isSuccessful) {
-
-                                if (response.body()!!.data.isEmpty())
-                                    noTrainee.value = true
-                                else
-                                    trainees.addAll(response!!.body()!!.data)
-                                showProgress.value = false
-                                shutDownError.value = false
-                            } else {
-
-                                shutDownError.value = true
-                                errorMessage.value =
-                                    "An error occurred while connecting to the server. Please try again."
-                                showProgress.value = false
-                            }
-
-                        }
-
-                        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-
-                            shutDownError.value = true
-                            errorMessage.value =
-                                "check your internet connection"
-                            showProgress.value = false
-                        }
-
-                    })
-            } catch (e: Exception) {
-
-                shutDownError.value = true
-                errorMessage.value = "Unexpected error: " + e.message.toString()
-                showProgress.value = false
-            }
-
-        }
-    }
+//    fun getAllTrainees(
+//        trainees: MutableList<ItemData>,
+//        showProgress: MutableState<Boolean>,
+//        shutDownError: MutableState<Boolean>,
+//        errorMessage: MutableState<String>,
+//        noTrainee: MutableState<Boolean>,
+//        navController: NavHostController
+//    ) {
+//
+//        val campId = getCurrentCamp()?.id?.toInt()
+//        viewModelScope.launch(Dispatchers.IO) {
+//
+//            try {
+//                connect.connect().getTraineesByCampId(campId!!, "Bearer $token")
+//                    .enqueue(object : Callback<ApiResponse> {
+//                        override fun onResponse(
+//                            call: Call<ApiResponse>,
+//                            response: Response<ApiResponse>
+//                        ) {
+//
+//                            trainees.clear()
+//                            noTrainee.value = false
+//                            if (response.isSuccessful) {
+//
+//                                if(response.body()?.data==null&&response.body()?.message=="Unauthorized."){
+//                                    navController.navigate(ScreensRoute.LogInScreen.route)
+//                                }else{
+//                                    if (response.body()!!.data.isEmpty())
+//                                        noTrainee.value = true
+//                                    else
+//                                        trainees.addAll(response!!.body()!!.data)
+//                                }
+//                                showProgress.value = false
+//                                shutDownError.value = false
+//                            } else {
+//
+//                                shutDownError.value = true
+//                                errorMessage.value =
+//                                    "An error occurred while connecting to the server. Please try again."
+//                                showProgress.value = false
+//                            }
+//
+//                        }
+//
+//                        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+//
+//                            shutDownError.value = true
+//                            errorMessage.value =
+//                                "check your internet connection"
+//                            showProgress.value = false
+//                        }
+//
+//                    })
+//            } catch (e: Exception) {
+//
+//                shutDownError.value = true
+//                errorMessage.value = "Unexpected error: " + e.message.toString()
+//                showProgress.value = false
+//            }
+//
+//        }
+//    }
 
     fun getPresentTrainees(
         itemsCase: MutableState<String>,
@@ -102,7 +97,8 @@ class ApiViewModel:ViewModel(){
         showProgress: MutableState<Boolean>,
         shutDownError: MutableState<Boolean>,
         errorMessage: MutableState<String>,
-        selectedTrainee:String
+        selectedTrainee:String,
+        navController: NavHostController
     ) {
 
         val campId = getCurrentCamp()?.id?.toInt()
@@ -121,29 +117,31 @@ class ApiViewModel:ViewModel(){
 
                             trainees.clear()
                             itemsCase.value = ""
+
                             if (response.isSuccessful) {
 
-                                if (response.body()!!.message == "No current session for now.")
-                                    itemsCase.value = "No current session for now."
-                                else {
-                                    if (response.body()!!.data.size == 0) {
-                                        when (selectedTrainee) {
+                                if(response.body()?.data==null&&response.body()?.message=="Unauthorized."){
+                                    navController.navigate(ScreensRoute.LogInScreen.route)
+                                }else{
+                                    if (response.body()!!.message == "No current session for now.")
+                                        itemsCase.value = "No current session for now."
+                                    else {
+                                        if (response.body()!!.data.size == 0) {
+                                            when (selectedTrainee) {
 
-                                            "" -> {
-                                                itemsCase.value = "No trainee has presented yet"
-                                            }
+                                                "" -> {
+                                                    itemsCase.value = "No trainee has presented yet"
+                                                }
 
-                                            else -> {
-                                                itemsCase.value = "Not Found"
+                                                else -> {
+                                                    itemsCase.value = "Not Found"
+                                                }
                                             }
-                                        }
-                                        showProgress.value = false
-                                    } else {
-                                        response.body()?.data?.let {
-                                            trainees.addAll(it)
+                                            showProgress.value = false
+                                        } else {
+                                            trainees.addAll(response.body()!!.data)
                                             showProgress.value = false
                                         }
-
                                     }
                                 }
                                 showProgress.value = false
@@ -175,57 +173,62 @@ class ApiViewModel:ViewModel(){
         }
     }
 
-    fun getCamps(
-        camps: MutableList<ItemData>,
-        itemsCase: MutableState<String>,
-        showProgress: MutableState<Boolean>,
-        shutDownError: MutableState<Boolean>,
-        errorMessage: MutableState<String>,
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-
-                connect.connect().getAllCamps("Bearer $token").enqueue(object :
-                    Callback<ApiResponse> {
-                    override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
-
-                        camps.clear()
-                        itemsCase.value = ""
-                        showProgress.value = true
-                        if (response.isSuccessful) {
-
-                            if (response.body()!!.data == null)
-                                itemsCase.value = "No Camps"
-                            camps.addAll(response.body()!!.data)
-                            if (itemsCase.value.isNotEmpty() || camps.isNotEmpty())
-                                showProgress.value = false
-
-                        } else {
-                            shutDownError.value = true
-                            errorMessage.value =
-                                "An error occurred while connecting to the server. Please try again."
-                            showProgress.value = false
-                        }
-
-                    }
-
-                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-
-                        showProgress.value = false
-                        shutDownError.value = true
-                        errorMessage.value = "check your internet connection"
-
-                    }
-                })
-            } catch (e: Exception) {
-
-                shutDownError.value = true
-                errorMessage.value = "Unexpected error: " + e.message.toString()
-                showProgress.value = false
-            }
-        }
-
-    }
+//    fun getCamps(
+//        camps: MutableList<ItemData>,
+//        itemsCase: MutableState<String>,
+//        showProgress: MutableState<Boolean>,
+//        shutDownError: MutableState<Boolean>,
+//        errorMessage: MutableState<String>,
+//        navController: NavHostController
+//    ) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//
+//                connect.connect().getCamps("Bearer $token").enqueue(object :
+//                    Callback<ApiResponse> {
+//                    override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+//
+//                        camps.clear()
+//                        itemsCase.value = ""
+//                        showProgress.value = true
+//                        if (response.isSuccessful) {
+//
+//                            if (response.body()?.data==null&&response.body()?.message=="Unauthorized.")
+//                                navController.navigate(ScreensRoute.LogInScreen.route)
+//                             else if(response.body()!!.data.isEmpty()) {
+//                                itemsCase.value = "No Camps"
+//                            }else{
+//                                camps.addAll(response.body()!!.data)
+//                            }
+//                            if (itemsCase.value.isNotEmpty() || camps.isNotEmpty())
+//                                showProgress.value = false
+//
+//                        } else {
+//                            shutDownError.value = true
+//                            errorMessage.value =
+//                                "An error occurred while connecting to the server. Please try again."
+//                            showProgress.value = false
+//                        }
+//
+//                    }
+//
+//                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+//
+//                        showProgress.value = false
+//                        shutDownError.value = true
+//                        errorMessage.value = "check your internet connection"
+//
+//                    }
+//                })
+//            } catch (e: Exception) {
+//
+//                shutDownError.value = true
+//                errorMessage.value = "Unexpected error: " + e.message.toString()
+//                showProgress.value = false
+//            }
+//        }
+//
+//    }
 
     fun addTraineeToAttendance(
         traineeRequirements: AttendanceRegistrationRequirements,
@@ -249,10 +252,12 @@ class ApiViewModel:ViewModel(){
 
                             if (response.isSuccessful) {
 
-                                val apiResponseBody = response.body()!!
-                                if (apiResponseBody != null) {
+                                val apiResponseBody = response.body()
+                                if (response.body()?.data==null&&response.body()?.message=="Unauthorized.") {
+                                   navController.navigate(ScreensRoute.LogInScreen.route)
+                                } else {
                                     val apiResponseJson = Uri.encode(Gson().toJson(apiResponseBody))
-                                    if (!apiResponseBody.isSuccess) {
+                                    if (!apiResponseBody!!.isSuccess) {
                                         shutDownFailedDialog.value = true
                                         showProgress.value = false
                                         message.value = apiResponseBody.message
@@ -260,14 +265,11 @@ class ApiViewModel:ViewModel(){
                                         navController.navigate(ScreensRoute.TraineeScreen.route + "/${apiResponseJson}")
                                         showProgress.value = false
                                     }
-                                } else {
-                                    shutDownError.value = true
-                                    errorMessage.value = "Response body is null"
                                 }
                             } else {
                                 shutDownError.value = true
                                 errorMessage.value =
-                                    "An error occurred while connecting to the server. Please try again."
+                                    "An error occurred while connecting to the server."
                             }
 
                         }
@@ -296,6 +298,7 @@ class ApiViewModel:ViewModel(){
         message: MutableState<String>,
         shutDownError: MutableState<Boolean>,
         errorMessage: MutableState<String>,
+        navController: NavHostController
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -308,8 +311,12 @@ class ApiViewModel:ViewModel(){
 
                             if (response.isSuccessful) {
 
-                                message.value = response.body()!!.message
-                                isSuccess.value = response.body()!!.isSuccess
+                                if(response.body()?.data==null&&response.body()?.message=="Unauthorized."){
+                                    navController.navigate(ScreensRoute.LogInScreen.route)
+                                }else{
+                                    message.value = response.body()!!.message
+                                    isSuccess.value = response.body()!!.isSuccess
+                                }
 
                             } else {
 
@@ -450,7 +457,7 @@ class ApiViewModel:ViewModel(){
 
                                 shutDownError.value = true
                                 errorMessage.value =
-                                    "An error occurred while connecting to the server. Please try again."
+                                    "An error occurred while connecting to the server."
                                 showProgress.value = false
                             }
 
@@ -517,7 +524,7 @@ class ApiViewModel:ViewModel(){
 
                                 shutDownError.value = true
                                 errorMessage.value =
-                                    "An error occurred while connecting to the server. Please try again."
+                                    "An error occurred while connecting to the server."
                                 showProgress.value = false
                             }
 
@@ -542,73 +549,76 @@ class ApiViewModel:ViewModel(){
 
     }
 
-    fun login(
-        loginData: LoginRequirements,
-        shutDownError: MutableState<Boolean>,
-        errorMessage: MutableState<String>,
-        showProgress: MutableState<Boolean>,
-        navController: NavHostController,
-        userData: MutableState<UserData>
-    ) {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                connect.connect().login(loginData).enqueue(object : Callback<LoginResponse> {
-                    override fun onResponse(
-                        call: Call<LoginResponse>,
-                        response: Response<LoginResponse>
-                    ) {
-                        val gson = Gson()
-                        if (response.isSuccessful) {
-
-                            val loginResponse = response.body()
-                            val result = loginResponse!!.message
-
-                            if (result == "Success") {
-
-                                val json2 = gson.toJson(loginResponse.data)
-                                MainActivity.selectedUser_sharedPref.edit()
-                                    .putString(MainActivity.SELECTED_USER, json2).apply()
-
-                                val json3 = gson.toJson(loginData)
-                                userData_sharedPref.edit().putString(LOGIN_REQUIREMENTS, json3)
-                                    .apply()
-
-                                if (getCurrentUser()?.token == loginResponse.data!!.token)
-                                    navController.navigate(ScreensRoute.MainScreen.route)
-
-                                loginResponse?.data?.let {
-                                    userData.value = it
-                                }
-
-                            } else {
-
-                                shutDownError.value = true
-                                errorMessage.value = result
-                                showProgress.value = false
-                            }
-
-                        } else {
-                            shutDownError.value = true
-                            errorMessage.value =
-                                "An error occurred while connecting to the server. Please try again."
-                            showProgress.value = false
-                        }
-                    }
-
-                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-
-                        shutDownError.value = true
-                        errorMessage.value = "check your internet connection"
-                        showProgress.value = false
-                    }
-                })
-            } catch (e: Exception) {
-
-                shutDownError.value = true
-                errorMessage.value = "Unexpected error: " + e.message.toString()
-                showProgress.value = false
-            }
-        }
-    }
+//    fun login(
+//        loginData: LoginRequirements,
+//        shutDownError: MutableState<Boolean>,
+//        errorMessage: MutableState<String>,
+//        showProgress: MutableState<Boolean>,
+//        navController: NavHostController,
+//        userData: MutableState<UserData>
+//    ) {
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                connect.connect().login(loginData).enqueue(object : Callback<LoginResponse> {
+//                    override fun onResponse(
+//                        call: Call<LoginResponse>,
+//                        response: Response<LoginResponse>
+//                    ) {
+//                        val gson = Gson()
+//
+//                        if (response.isSuccessful) {
+//
+//                            val loginResponse = response.body()
+//                            val result = loginResponse!!.message
+//
+//                            if (result == "Success") {
+//
+//                                val json2 = gson.toJson(loginResponse.data)
+//                                MainActivity.currentUser_sharedPref.edit()
+//                                    .putString(MainActivity.CURRENT_USER, json2).apply()
+//
+//                                val json3 = gson.toJson(loginData)
+//                                userData_sharedPref.edit().putString(LOGIN_REQUIREMENTS, json3)
+//                                    .apply()
+//
+//                                if (getCurrentUser()?.token == loginResponse.data!!.token) {
+//
+//                                    navController.navigate(ScreensRoute.MainScreen.route)
+//                                }
+//
+//                                loginResponse?.data?.let {
+//                                    userData.value = it
+//                                }
+//
+//                            } else {
+//
+//                                shutDownError.value = true
+//                                errorMessage.value = result
+//                                showProgress.value = false
+//                            }
+//
+//                        } else {
+//                            shutDownError.value = true
+//                            errorMessage.value =
+//                                "An error occurred while connecting to the server."
+//                            showProgress.value = false
+//                        }
+//                    }
+//
+//                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+//
+//                        shutDownError.value = true
+//                        errorMessage.value = "check your internet connection"
+//                        showProgress.value = false
+//                    }
+//                })
+//            } catch (e: Exception) {
+//
+//                shutDownError.value = true
+//                errorMessage.value = "Unexpected error: " + e.message.toString()
+//                showProgress.value = false
+//            }
+//        }
+//    }
 }

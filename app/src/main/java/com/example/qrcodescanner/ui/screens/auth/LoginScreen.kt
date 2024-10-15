@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.auth
 
 
 import android.util.Log
@@ -31,32 +31,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.data.model.LoginRequirements
-import com.example.qrcodescanner.data.model.UserData
 import com.example.qrcodescanner.data.utils.*
 import com.example.qrcodescanner.ui.components.checkBox
 import com.example.qrcodescanner.ui.components.space
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.ui.utils.checkUserName
 import com.example.qrcodescanner.MainActivity
-import com.example.qrcodescanner.MainActivity.Companion.apiViewModel
+import com.example.qrcodescanner.MainActivity.Companion.LOGIN_REQUIREMENTS
+import com.example.qrcodescanner.MainActivity.Companion.userData_sharedPref
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
-import com.example.qrcodescanner.data.apis.ViewModelHelper
+import com.example.qrcodescanner.data.apis.UIState
+import com.example.qrcodescanner.data.viewModel.authViewModels.LoginViewModel
 import com.example.qrcodescanner.ui.components.PasswordTextField
 import com.example.qrcodescanner.ui.components.UserNameTextField
 import com.example.qrcodescanner.ui.components.errorDialog
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
 
 
     val scrollState = rememberScrollState()
-    LaunchedEffect(Unit){
-        val rememberMe = MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
+    LaunchedEffect(Unit) {
+        val rememberMe =
+            MainActivity.rememberMe_sharedPref.getString(MainActivity.REMEMBER_ME, null)
 
 
         if (rememberMe.toString() == "true" && getLoginData() != null) {
@@ -110,6 +114,7 @@ fun LoginScreen(navController: NavHostController) {
                 shutDownError,
                 errorMessage,
                 navController,
+                viewModel
             )
         }
 
@@ -185,24 +190,66 @@ fun mainContent(
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
     navController: NavHostController,
+    viewModel: LoginViewModel
 ) {
 
-    val password= viewModelHelper.password.collectAsState()
-    val userName= viewModelHelper.userName.collectAsState()
+    val password = viewModelHelper.password.collectAsState()
+    val userName = viewModelHelper.userName.collectAsState()
     var isUserNameError = remember() { mutableStateOf(false) }
     val isPasswordError = remember { mutableStateOf(false) }
     val passError = remember { mutableStateOf("") }
     val userNameError = remember { mutableStateOf("") }
     val showProgress = remember { mutableStateOf(false) }
     val scop = rememberCoroutineScope()
+    val loginState by viewModel.state.collectAsState()
 
-    val userData = remember {
-        mutableStateOf(
-            UserData(
-                "", "",
-                "", emptyList(), "", ""
-            )
-        )
+    when (loginState) {
+
+        is UIState.Loading -> {
+
+            showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (loginState as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+                val loginResponse = (loginState as UIState.Success).data
+                val result = loginResponse!!.message
+                if (result == "Success") {
+
+                    val gson=Gson()
+                    val json2 = gson.toJson(loginResponse.data)
+                    MainActivity.currentUser_sharedPref.edit()
+                        .putString(MainActivity.CURRENT_USER, json2).apply()
+
+                    val json3 = gson.toJson(LoginRequirements(
+                        userName = userName.value,
+                        password = password.value
+                    ))
+
+                    userData_sharedPref.edit().putString(LOGIN_REQUIREMENTS, json3)
+                        .apply()
+
+                    navController.navigate(ScreensRoute.MainScreen.route)
+
+                } else {
+
+                    shutDownError.value = true
+                    errorMessage.value = result
+                }
+                showProgress.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
     }
 
     Column(
@@ -278,16 +325,11 @@ fun mainContent(
                     )
                     if (!checkPasswordResult && !checkUserNameResult) {
                         scop.launch {
-                            apiViewModel.login(
-                                loginData = LoginRequirements(
+                            viewModel.login(
+                                loginRequirements = LoginRequirements(
                                     userName = userName.value,
                                     password = password.value
-                                ),
-                                userData = userData,
-                                navController = navController,
-                                shutDownError = shutDownError,
-                                errorMessage = errorMessage,
-                                showProgress = showProgress
+                                )
                             )
                         }
                         showProgress.value = true

@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.ui.components.ConfirmPasswordTextField
-import com.example.qrcodescanner.ui.components.PasswordTextField
 import com.example.qrcodescanner.ui.components.RestPasswordTextField
 import com.example.qrcodescanner.ui.components.errorDialog
 import com.example.qrcodescanner.ui.components.progressBar

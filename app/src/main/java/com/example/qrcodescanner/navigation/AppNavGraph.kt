@@ -6,15 +6,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.qrcodescanner.data.model.AttendanceRegistrationResponse
-import com.example.qrcodescanner.ui.screens.AttendanceScreen
-import com.example.qrcodescanner.ui.screens.ExtraPointsScreen
-import com.example.qrcodescanner.ui.screens.ForgotPasswordScreen
-import com.example.qrcodescanner.ui.screens.LoginScreen
-import com.example.qrcodescanner.ui.screens.MainScreen
-import com.example.qrcodescanner.ui.screens.OTPCode
-import com.example.qrcodescanner.ui.screens.ResetPasswordScreen
-import com.example.qrcodescanner.ui.screens.SplashScreen
-import com.example.qrcodescanner.ui.screens.TraineeScreen
+import com.example.qrcodescanner.ui.screens.trainee.AttendanceScreen
+import com.example.qrcodescanner.ui.screens.trainee.ExtraPointsScreen
+import com.example.qrcodescanner.ui.screens.auth.ForgotPasswordScreen
+import com.example.qrcodescanner.ui.screens.auth.LoginScreen
+import com.example.qrcodescanner.ui.screens.trainee.MainScreen
+import com.example.qrcodescanner.ui.screens.auth.OTPCode
+import com.example.qrcodescanner.ui.screens.auth.ResetPasswordScreen
+import com.example.qrcodescanner.ui.screens.auth.SplashScreen
+import com.example.qrcodescanner.ui.screens.trainee.TraineeScreen
 import com.google.gson.Gson
 
 @Composable

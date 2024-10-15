@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.trainee
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background

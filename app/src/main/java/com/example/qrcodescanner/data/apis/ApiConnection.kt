@@ -3,8 +3,9 @@ package com.example.qrcodescanner.data.apis
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
-class ApiConnection {
+class ApiConnection @Inject constructor(){
 
     fun connect ():ApiServices {
         val apiServices: ApiServices

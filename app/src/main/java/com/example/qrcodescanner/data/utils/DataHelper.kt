@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.MainActivity
-import com.example.qrcodescanner.MainActivity.Companion.SELECTED_USER
+import com.example.qrcodescanner.MainActivity.Companion.CURRENT_USER
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.data.model.*
 import com.example.qrcodescanner.MainActivity.Companion.REMEMBER_ME
@@ -17,11 +17,12 @@ import java.util.*
 fun getCurrentUser(): UserData? {
 
     val gson = Gson()
-    val json = MainActivity.selectedUser_sharedPref.getString(SELECTED_USER, null)
+    val json = MainActivity.currentUser_sharedPref.getString(CURRENT_USER, null)
     val currentUser = json?.let { gson.fromJson(it, UserData::class.java) }
 
     return currentUser
 }
+
 fun logout(
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,

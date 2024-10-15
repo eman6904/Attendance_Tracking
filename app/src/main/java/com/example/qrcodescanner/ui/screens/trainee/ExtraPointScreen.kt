@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.trainee
 
 import android.app.Activity
 import android.util.Log
@@ -22,11 +22,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.captlization
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.TraineesViewModel
 import com.example.qrcodescanner.ui.components.errorDialog
 import com.example.qrcodescanner.ui.components.pointsTextField
 import com.example.qrcodescanner.ui.components.searchAboutTraineeForUpdatePoints
@@ -37,7 +39,7 @@ import com.example.qrcodescanner.ui.utils.checkPoints
 
 
 @Composable
-fun ExtraPointsScreen(navController: NavHostController) {
+fun ExtraPointsScreen(navController: NavHostController,viewModel: TraineesViewModel = hiltViewModel()) {
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -94,7 +96,7 @@ fun ExtraPointsScreen(navController: NavHostController) {
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             space(h = 30)
-            searchAboutTraineeForUpdatePoints(traineeId)
+            searchAboutTraineeForUpdatePoints(traineeId, navController,viewModel)
             errorMessage(show = traineeNameRequired.value)
             space(h = 50)
             pointsTextField()
@@ -112,7 +114,8 @@ fun ExtraPointsScreen(navController: NavHostController) {
                 showSending,
                 shutDownError,
                 errorMessage,
-                pointsError
+                pointsError,
+                navController
             )
             if (showSending.value) {
                 Text(
@@ -153,7 +156,7 @@ fun traineeModel(
         text = captlization(trainee.name),
         modifier = Modifier
             .clickable {
-                viewModelHelper.settTrainee( captlization(trainee.name))
+                viewModelHelper.settTrainee(captlization(trainee.name))
                 traineeId.value = trainee.id
                 active.value = false
             }

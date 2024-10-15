@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.trainee
 
 
 import android.app.Activity
@@ -22,12 +22,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.qrcodescanner.MainActivity.Companion.token
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.data.model.UserData
 import com.example.qrcodescanner.data.utils.*
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.CampsViewModel
 import com.example.qrcodescanner.ui.components.campReminder
 import com.example.qrcodescanner.ui.components.errorDialog
 import com.example.qrcodescanner.ui.components.mainButtons
@@ -37,7 +39,7 @@ import com.example.qrcodescanner.ui.components.space
 
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController,viewModel: CampsViewModel = hiltViewModel()) {
 
     token = getCurrentUser()!!.token
 
@@ -92,6 +94,7 @@ fun MainScreen(navController: NavHostController) {
                     navController = navController,
                     showReminder = showReminder,
                     currentCampName = currentCampName,
+                    viewModel = viewModel
                 )
             }
 
@@ -157,7 +160,7 @@ fun headerSection(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp,end=35.dp)
+                .padding(start = 10.dp, end = 35.dp)
         ) {
             Column {
                 Text(
@@ -192,6 +195,7 @@ fun mainContent(
     navController: NavHostController,
     showReminder: MutableState<Boolean>,
     currentCampName: MutableState<String>,
+    viewModel: CampsViewModel
 ) {
 
     Column(
@@ -208,9 +212,10 @@ fun mainContent(
         ) {
             mainButtons(
                 btnName = stringResource(R.string.select_camp),
-                navController,
-                showReminder,
-                currentCampName = currentCampName
+                navController = navController,
+                showReminder = showReminder,
+                currentCampName = currentCampName,
+                viewModel = viewModel
             )
         }
         Box(
@@ -232,9 +237,10 @@ fun mainContent(
         ) {
             mainButtons(
                 btnName = stringResource(R.string.view_attendance),
-                navController,
-                showReminder,
-                currentCampName
+                navController = navController,
+                showReminder = showReminder,
+                currentCampName =  currentCampName,
+                viewModel = viewModel
             )
         }
         Box(
@@ -245,9 +251,10 @@ fun mainContent(
         ) {
             mainButtons(
                 btnName = stringResource(R.string.extra_points),
-                navController,
-                showReminder,
-                currentCampName
+                navController = navController,
+                showReminder = showReminder,
+                currentCampName = currentCampName,
+                viewModel = viewModel
             )
         }
 

@@ -1,4 +1,4 @@
-package com.example.qrcodescanner.ui.screens
+package com.example.qrcodescanner.ui.screens.auth
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.tween
@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.data.utils.getCurrentUser
 import com.example.qrcodescanner.data.utils.getMode
 import com.example.qrcodescanner.navigation.ScreensRoute
 import kotlinx.coroutines.delay
@@ -38,7 +39,10 @@ fun SplashScreen(navController: NavHostController){
                 })
         )
         delay(2000L)
-        navController.navigate(ScreensRoute.LogInScreen.route)
+//        if(getCurrentUser()!=null)
+//            navController.navigate(ScreensRoute.MainScreen.route)
+//        else
+            navController.navigate(ScreensRoute.LogInScreen.route)
     }
 
     Box(
