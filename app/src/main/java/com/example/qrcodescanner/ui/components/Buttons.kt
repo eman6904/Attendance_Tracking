@@ -1,5 +1,6 @@
 package com.example.qrcodescanner.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,8 +15,10 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import com.example.qrcodescanner.MainActivity.Companion.apiViewModel2
+import com.example.qrcodescanner.MainActivity
+import com.example.qrcodescanner.MainActivity.Companion.LOGIN_REQUIREMENTS
+import com.example.qrcodescanner.MainActivity.Companion.userData_sharedPref
 import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.data.model.ExtraPointRequirements
 import com.example.qrcodescanner.data.model.PasswordResetRequirements
@@ -44,8 +49,14 @@ import com.example.qrcodescanner.ui.utils.checkEmail
 import com.example.qrcodescanner.ui.utils.checkPassword
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.ViewModel2
+import com.example.qrcodescanner.data.apis.UIState
+import com.example.qrcodescanner.data.model.LoginRequirements
+import com.example.qrcodescanner.data.viewModel.authViewModels.CheckOtpViewModel
+import com.example.qrcodescanner.data.viewModel.authViewModels.ForgetPasswordViewModel
+import com.example.qrcodescanner.data.viewModel.authViewModels.ResetPasswordViewModel
 import com.example.qrcodescanner.data.viewModel.traineeViewModels.CampsViewModel
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.TraineePointsViewModel
+import com.google.gson.Gson
 
 
 @Composable
@@ -169,7 +180,8 @@ fun updatePointsButton(
     shutDownError: MutableState<Boolean>,
     errorMessage: MutableState<String>,
     pointsError: MutableState<String>,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel:TraineePointsViewModel
 ) {
 
     val points= viewModelHelper.traineePoints.collectAsState()
@@ -184,27 +196,59 @@ fun updatePointsButton(
     val message = remember { mutableStateOf("") }
     val points_action=stringResource(id = R.string.points_action)
     val msg= stringResource(id = R.string.this_field_is_required)
+    val state by viewModel.state.collectAsState()
+
+    when (state) {
+
+        is UIState.Loading -> {
+
+            showSending.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showSending.value = false
+            errorMessage.value = (state as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                val response = (state as UIState.Success).data
+                if(response.message=="Unauthorized."){
+                    navController.navigate(ScreensRoute.LogInScreen.route)
+                }else{
+                    message.value = response.message
+                    isSuccess.value = response.isSuccess
+                }
+                showSending.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
 
 
     if (message.value.isNotEmpty()) {
         showMessage.value = true
-        showSending.value = false
-
     }
     if (showMessage.value)
-        updatePointsResponse(showMessage = showMessage, isSuccess = isSuccess, message)
+        updatePointsResponse(
+            showMessage = showMessage,
+            isSuccess = isSuccess,
+            message = message,
+            traineeId = traineeId
+            )
 
     Card(
         modifier = Modifier
             .clickable {
                 if (searchedTrainee.value.isNotEmpty() && pointsString.value.isNotEmpty() && pointsAction.value != points_action) {
-                    apiViewModel2.traineePointsUpdate(
-                        extraPoint = ExtraPointRequirements(traineeId.value, points.value),
-                        isSuccess = isSuccess,
-                        message = message,
-                        shutDownError = shutDownError,
-                        errorMessage = errorMessage,
-                        navController = navController
+                    viewModel.updateTraineePoints(
+                        extraPointRequirements = ExtraPointRequirements(traineeId.value, points.value),
                     )
                     showSending.value = true
 
@@ -247,7 +291,8 @@ fun sendOtpCodeButton(
     navController: NavHostController,
     showProgress: MutableState<Boolean>,
     shutDownError: MutableState<Boolean>,
-    errorMessage: MutableState<String>
+    errorMessage: MutableState<String>,
+    viewModel: ForgetPasswordViewModel
 ) {
 
     val message = remember { mutableStateOf(listOf<String>()) }
@@ -256,10 +301,56 @@ fun sendOtpCodeButton(
     val keyboardController = LocalSoftwareKeyboardController.current
     val context= LocalContext.current
     val email = viewModelHelper.email.collectAsState()
+    val state by viewModel.state.collectAsState()
 
+    when (state) {
+
+        is UIState.Loading -> {
+
+            showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (state as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                val apiResponse=(state as UIState.Success).data
+                isSuccess.value = false
+                message.value = listOf()
+
+                isSuccess.value = apiResponse.isSuccess
+                val newMessages = mutableListOf<String>()
+
+                if (apiResponse.message.isNotEmpty()) {
+
+                    newMessages.add(apiResponse.message)
+                } else {
+
+                    apiResponse.errors?.let { errors ->
+                        for (ms in apiResponse.errors) {
+
+                                newMessages.add(ms)
+                        }
+                    }
+                }
+                message.value = newMessages
+
+                showProgress.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
     if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value = false
     }
 
     if (shutDown.value)
@@ -275,13 +366,8 @@ fun sendOtpCodeButton(
         onClick = {
             keyboardController?.hide()
             if (!checkEmail(email=email.value,isEmailError=isEmailError,emailError=emailError,context)) {
-                apiViewModel2.forgotPassword(
+                viewModel.forgetPassword(
                     email.value,
-                    isSuccess,
-                    message,
-                    shutDownError,
-                    errorMessage,
-                    showProgress
                 )
                 showProgress.value = true
             }
@@ -313,7 +399,8 @@ fun resetPasswordButton(
     token: String,
     navController: NavHostController,
     shutDownError: MutableState<Boolean>,
-    errorMessage: MutableState<String>
+    errorMessage: MutableState<String>,
+    viewModel: ResetPasswordViewModel
 ) {
     val message = remember { mutableStateOf(listOf<String>()) }
     val isSuccess = remember { mutableStateOf(false) }
@@ -322,10 +409,57 @@ fun resetPasswordButton(
     val context= LocalContext.current
     val password= viewModelHelper.newPassword.collectAsState()
     val passConfirm= viewModelHelper.passwordConfirm.collectAsState()
+    val state by viewModel.state.collectAsState()
+
+    when (state) {
+
+        is UIState.Loading -> {
+
+            showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (state as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                val apiResponse=(state as UIState.Success).data
+                isSuccess.value = false
+                message.value = listOf()
+
+                isSuccess.value = apiResponse.isSuccess
+                val newMessages = mutableListOf<String>()
+
+                if (apiResponse.message.isNotEmpty()) {
+
+                    newMessages.add(apiResponse.message)
+                } else {
+                    apiResponse.errors?.let { errors ->
+                        for (ms in apiResponse.errors) {
+
+                                newMessages.add(ms)
+                        }
+                    }
+                }
+                message.value = newMessages
+
+                showProgress.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
+
 
     if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value = false
     }
     if (shutDown.value) {
 
@@ -346,19 +480,13 @@ fun resetPasswordButton(
             val checkConfirmPasswordResult= checkConfirmPassword(confirmPassword = passConfirm.value, password = password.value, isConfirmPassError = isConfirmPasswordError,
                 confirmPassError = confirmPasswordError,context=context)
             if (!checkPasswordResult&&!checkConfirmPasswordResult) {
-                apiViewModel2. resetPassword(
+                viewModel.resetPassword(
                     PasswordResetRequirements(
                         password.value,
                         token,
                         email
-                    ),
-                    isSuccess,
-                    message,
-                    shutDownError,
-                    errorMessage,
-                    showProgress
+                    )
                 )
-                showProgress.value = true
             }
         },
         colors = ButtonDefaults.buttonColors(
@@ -384,20 +512,66 @@ fun confirmOtpCodeButton(
     showProgress: MutableState<Boolean>,
     navController: NavHostController,
     shutDownError: MutableState<Boolean>,
-    errorMessage: MutableState<String>
+    errorMessage: MutableState<String>,
+    viewModel:CheckOtpViewModel
 ) {
 
     val otpNumber = remember { mutableStateOf<Int>(0) }
     val message = remember { mutableStateOf(listOf<String>()) }
-    val token2 = remember { mutableStateOf("eman") }
+    val userToken = remember { mutableStateOf("eman") }
     val isSuccess = remember { mutableStateOf(false) }
     val shutDown = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val viewModel2=ViewModel2()
+    val state by viewModel.state.collectAsState()
 
+    when (state) {
+
+        is UIState.Loading -> {
+
+            showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (state as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                val apiResponse=(state as UIState.Success).data
+                isSuccess.value = false
+                message.value = listOf()
+
+                isSuccess.value = apiResponse.isSuccess
+                val newMessages = mutableListOf<String>()
+
+                if (apiResponse.isSuccess)
+                    userToken.value = apiResponse.data
+                if (apiResponse.message.isNotEmpty()) {
+                    newMessages.add(apiResponse.message)
+                } else {
+                    apiResponse.errors?.let { errors ->
+                        for (ms in apiResponse.errors) {
+
+                                newMessages.add(ms)
+                        }
+                    }
+                }
+                message.value = newMessages
+
+                showProgress.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
     if (message.value.isNotEmpty()) {
         shutDown.value = true
-        showProgress.value = false
     }
     if (shutDown.value)
         checkOtpCodeResponse(
@@ -406,7 +580,7 @@ fun confirmOtpCodeButton(
             isSuccess = isSuccess,
             navController = navController,
             email = email,
-            token2 = token2.value
+            token2 = userToken.value
         )
 
     Button(
@@ -414,15 +588,9 @@ fun confirmOtpCodeButton(
 
             keyboardController?.hide()
             calcOtpNumber(otpDigits, otpNumber)
-            viewModel2.checkOtp(
+            viewModel.checkOtpCode(
                 email,
                 otpNumber.value,
-                isSuccess,
-                message,
-                token2,
-                shutDownError,
-                errorMessage,
-                showProgress
             )
             showProgress.value = true
         },

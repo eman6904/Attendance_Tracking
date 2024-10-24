@@ -1,7 +1,6 @@
 package com.example.qrcodescanner.ui.screens.trainee
 
 import android.app.Activity
-import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +27,7 @@ import com.example.qrcodescanner.MainActivity.Companion.viewModelHelper
 import com.example.qrcodescanner.R
 import com.example.qrcodescanner.data.model.ItemData
 import com.example.qrcodescanner.data.utils.captlization
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.TraineePointsViewModel
 import com.example.qrcodescanner.data.viewModel.traineeViewModels.TraineesViewModel
 import com.example.qrcodescanner.ui.components.errorDialog
 import com.example.qrcodescanner.ui.components.pointsTextField
@@ -39,7 +39,11 @@ import com.example.qrcodescanner.ui.utils.checkPoints
 
 
 @Composable
-fun ExtraPointsScreen(navController: NavHostController,viewModel: TraineesViewModel = hiltViewModel()) {
+fun ExtraPointsScreen(
+    navController: NavHostController,
+    traineeViewModel: TraineesViewModel = hiltViewModel(),
+    pointsViewModel: TraineePointsViewModel = hiltViewModel())
+    {
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -96,11 +100,10 @@ fun ExtraPointsScreen(navController: NavHostController,viewModel: TraineesViewMo
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             space(h = 30)
-            searchAboutTraineeForUpdatePoints(traineeId, navController,viewModel)
+            searchAboutTraineeForUpdatePoints(traineeId, navController,traineeViewModel)
             errorMessage(show = traineeNameRequired.value)
             space(h = 50)
             pointsTextField()
-            Log.d("points",pointsValidation.value.toString())
             errorMessage(show = pointsValidation.value, error = pointsError.value)
             space(h = 50)
             selectPointAction(itemList = pointType)
@@ -115,7 +118,8 @@ fun ExtraPointsScreen(navController: NavHostController,viewModel: TraineesViewMo
                 shutDownError,
                 errorMessage,
                 pointsError,
-                navController
+                navController,
+                pointsViewModel
             )
             if (showSending.value) {
                 Text(

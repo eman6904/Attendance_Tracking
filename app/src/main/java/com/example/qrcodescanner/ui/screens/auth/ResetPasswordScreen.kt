@@ -26,8 +26,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.data.viewModel.authViewModels.ResetPasswordViewModel
 import com.example.qrcodescanner.ui.components.ConfirmPasswordTextField
 import com.example.qrcodescanner.ui.components.RestPasswordTextField
 import com.example.qrcodescanner.ui.components.errorDialog
@@ -39,7 +41,8 @@ import com.example.qrcodescanner.ui.components.space
 fun ResetPasswordScreen(
     navController: NavHostController,
     email: String,
-    token: String
+    token: String,
+    viewModel:ResetPasswordViewModel = hiltViewModel()
 ) {
 
     val passwordError = rememberSaveable { mutableStateOf("") }
@@ -156,7 +159,8 @@ fun ResetPasswordScreen(
                 token,
                 navController,
                 shutDownError,
-                errorMessage
+                errorMessage,
+                viewModel
             )
             space(h = 10)
             Box(

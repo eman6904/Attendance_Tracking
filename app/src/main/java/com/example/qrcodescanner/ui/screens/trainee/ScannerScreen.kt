@@ -2,6 +2,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.graphics.Rect
+import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,20 +37,23 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.data.model.AttendanceRegistrationRequirements
 import com.example.qrcodescanner.data.utils.getCurrentCamp
 import com.example.qrcodescanner.ui.components.rejectedTrainee
 import com.example.qrcodescanner.R
-import com.example.qrcodescanner.data.apis.ViewModel2
+import com.example.qrcodescanner.data.apis.UIState
+import com.example.qrcodescanner.data.viewModel.traineeViewModels.AttendanceRegistrationViewModel
 import com.example.qrcodescanner.ui.components.scannerErrorDialog
 import com.example.qrcodescanner.navigation.ScreensRoute
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.gson.Gson
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @Composable
-fun QrScannerScreen(navController: NavHostController) {
+fun QrScannerScreen(navController: NavHostController,viewModel:AttendanceRegistrationViewModel = hiltViewModel()) {
 
     val barcodeValue = remember { mutableStateOf("") }
     val errorMessage = remember { mutableStateOf("") }
@@ -56,7 +61,48 @@ fun QrScannerScreen(navController: NavHostController) {
     val shutDownError = remember { mutableStateOf(false) }
     val shutDownFailedDialog = remember { mutableStateOf(false) }
     val showProgress = remember { mutableStateOf(false) }
-    val viewModel2= ViewModel2()
+    val loginState by viewModel.state.collectAsState()
+
+    when (loginState) {
+
+        is UIState.Loading -> {
+
+            showProgress.value = true
+        }
+
+        is UIState.Error -> {
+
+            shutDownError.value = true
+            showProgress.value = false
+            errorMessage.value = (loginState as UIState.Error).message
+        }
+
+        is UIState.Success -> {
+
+            LaunchedEffect(Unit) {
+
+                val attendanceRegResponse = (loginState as UIState.Success).data
+                message.value = ""
+                if (attendanceRegResponse.message=="Unauthorized.") {
+                    navController.navigate(ScreensRoute.LogInScreen.route)
+                } else {
+                    val apiResponseJson = Uri.encode(Gson().toJson(attendanceRegResponse))
+                    if (!attendanceRegResponse.isSuccess) {
+
+                        shutDownFailedDialog.value = true
+                        message.value = attendanceRegResponse.message
+                    } else {
+
+                        navController.navigate(ScreensRoute.TraineeScreen.route + "/${apiResponseJson}")
+                    }
+                }
+                showProgress.value = false
+            }
+        }
+        else -> {
+            Log.d("state", "else")
+        }
+    }
     scannerErrorDialog(shutDownError, errorMessage,showProgress,barcodeValue)
 
     if (shutDownFailedDialog.value) {
@@ -68,20 +114,13 @@ fun QrScannerScreen(navController: NavHostController) {
         )
     }
     if (barcodeValue.value.isNotEmpty()) {
-
         LaunchedEffect(Unit) {
             showProgress.value=true
-            viewModel2.addTraineeToAttendance(
-                traineeRequirements = AttendanceRegistrationRequirements(
+            viewModel.addTraineeToAttendance(
+                traineeId = AttendanceRegistrationRequirements(
                     barcodeValue.value,
                     getCurrentCamp()!!.id
-                ),
-                navController = navController,
-                errorMessage = errorMessage,
-                shutDownError = shutDownError,
-                message = message,
-                shutDownFailedDialog = shutDownFailedDialog,
-                showProgress = showProgress
+                )
             )
         }
     }

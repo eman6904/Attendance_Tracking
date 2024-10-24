@@ -27,8 +27,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.data.viewModel.authViewModels.ForgetPasswordViewModel
 import com.example.qrcodescanner.ui.components.EmailTextField
 import com.example.qrcodescanner.ui.components.errorDialog
 import com.example.qrcodescanner.ui.components.progressBar
@@ -36,7 +38,7 @@ import com.example.qrcodescanner.ui.components.sendOtpCodeButton
 import com.example.qrcodescanner.ui.components.space
 
 @Composable
-fun ForgotPasswordScreen(navController: NavHostController) {
+fun ForgotPasswordScreen(navController: NavHostController,viewModel:ForgetPasswordViewModel = hiltViewModel()) {
 
     var isEmailError = rememberSaveable() { mutableStateOf(false) }
     var emailError = rememberSaveable() { mutableStateOf("") }
@@ -134,7 +136,8 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                         showProgress = showProgress,
                         shutDownError = shutDownError,
                         errorMessage = errorMessage,
-                        emailError = emailError
+                        emailError = emailError,
+                        viewModel = viewModel
                     )
                     space(h = 10)
                     Box(

@@ -22,8 +22,10 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.qrcodescanner.R
+import com.example.qrcodescanner.data.viewModel.authViewModels.CheckOtpViewModel
 import com.example.qrcodescanner.ui.components.OTPDigit
 import com.example.qrcodescanner.ui.components.confirmOtpCodeButton
 import com.example.qrcodescanner.ui.components.errorDialog
@@ -32,7 +34,7 @@ import com.example.qrcodescanner.ui.components.space
 
 
 @Composable
-fun OTPCode(navController: NavHostController, email: String) {
+fun OTPCode(navController: NavHostController, email: String,viewModel:CheckOtpViewModel = hiltViewModel()) {
 
     val showProgress = remember { mutableStateOf(false) }
     val otpDigits = ArrayList<MutableState<String>>()
@@ -119,7 +121,8 @@ fun OTPCode(navController: NavHostController, email: String) {
                     showProgress,
                     navController,
                     shutDownError,
-                    errorMessage
+                    errorMessage,
+                    viewModel = viewModel
                 )
                 space(h = 15)
                 progressBar(show = showProgress)

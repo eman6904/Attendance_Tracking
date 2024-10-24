@@ -1,9 +1,9 @@
 package com.example.qrcodescanner.data.model
 
-data class PasswordResetResponse(
+data class PresentedTraineesResponse(
     val statusCode: Int,
     val isSuccess: Boolean,
     val message: String,
-    val data: String,
-    val errors:List<String>?
+    val data: Data?,
+    val errors: Any?
 )

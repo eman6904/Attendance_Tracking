@@ -106,7 +106,7 @@ fun screenBody(
         ) {
             if (traineeItems.data?.imageUrl == null) {
                 Icon(
-                    painterResource(R.drawable.profile_photo),
+                    painterResource(R.drawable.profile2),
                     tint = colorResource(id = buttonColor.value),
                     modifier = Modifier
                         .fillMaxSize(),

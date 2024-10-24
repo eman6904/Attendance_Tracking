@@ -1,5 +1,6 @@
 package com.example.qrcodescanner.data.apis
 
+import com.example.qrcodescanner.R
 import com.example.qrcodescanner.data.model.*
 import retrofit2.Call
 import retrofit2.Response
@@ -17,26 +18,31 @@ interface ApiServices {
      suspend fun getCamps(@Header("Authorization") token: String): Response<ApiResponse>
 
     @POST("Mobile/addTraineeToAttendence")
-     fun addTraineeToAttendance(
+    suspend fun addTraineeToAttendance(
         @Body traineeId: AttendanceRegistrationRequirements,
         @Header("Authorization") token: String
-    ): Call<AttendanceRegistrationResponse>
+    ): Response<AttendanceRegistrationResponse>
 
 
     @GET("Mobile/getPresentTrainees")
-     fun getPresentTrainees(
+    suspend fun getPresentTrainees(
         @Query("campId") campId: Int,
         @Query("currentDate")currentDate:String,
         @Query("keyWord")keyWord:String,
         @Header("Authorization") token: String
-    ): Call<ApiResponse>
+    ): Response<PresentedTraineesResponse>
 
+    @GET("Mobile/getAbsenceTrainees/{campId}")
+    suspend fun getAbsenceTrainees(
+        @Path("campId") campId: Int,
+        @Header("Authorization") token: String
+    ): Response<ApiResponse>
 
     @PUT("Mobile/updateTraineePoints")
-    fun traineePointsUpdate(
+    suspend fun traineePointsUpdate(
         @Body extraPoint: ExtraPointRequirements,
         @Header("Authorization") token: String
-    ): Call<ApiResponse>
+    ): Response<ApiResponse>
 
     @POST("Auth/mobile-login")
     suspend fun login(
@@ -44,11 +50,11 @@ interface ApiServices {
     ): Response<LoginResponse>
 
     @POST("Auth/forget-password")
-    fun forgetPassword(@Query("email")email:String):Call<PasswordResetResponse>
+    suspend fun forgetPassword(@Query("email")email:String):Response<PasswordResetResponse>
 
     @GET("Auth/checkResetOtp")
-    fun checkOtp(@Query("Email")email:String, @Query("Otp")otp:Int):Call<PasswordResetResponse>
+    suspend fun checkOtp(@Query("Email")email:String, @Query("Otp")otp:Int):Response<PasswordResetResponse>
 
     @POST("Auth/reset-password")
-    fun resetPassword(@Body resetPassword:PasswordResetRequirements):Call<PasswordResetResponse>
+    suspend fun resetPassword(@Body resetPassword:PasswordResetRequirements):Response<PasswordResetResponse>
 }

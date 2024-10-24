@@ -39,9 +39,9 @@ fun SplashScreen(navController: NavHostController){
                 })
         )
         delay(2000L)
-//        if(getCurrentUser()!=null)
-//            navController.navigate(ScreensRoute.MainScreen.route)
-//        else
+        if(getCurrentUser()!=null)
+            navController.navigate(ScreensRoute.MainScreen.route)
+        else
             navController.navigate(ScreensRoute.LogInScreen.route)
     }
 

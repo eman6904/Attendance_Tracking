@@ -11,8 +11,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import com.example.qrcodescanner.data.apis.ApiConnection
-import com.example.qrcodescanner.data.apis.ViewModel2
-import com.example.qrcodescanner.data.apis.ViewModelHelper
+import com.example.qrcodescanner.data.viewModel.utils.ViewModelHelper
 import com.example.qrcodescanner.data.utils.getCurrentDate
 import com.example.qrcodescanner.data.utils.getMode
 import com.example.qrcodescanner.navigation.appNavGraph
@@ -40,10 +39,8 @@ class MainActivity : ComponentActivity() {
         lateinit var userData_sharedPref: SharedPreferences
         lateinit var mode_sharedPref: SharedPreferences
         lateinit var expiryDate_sharedpref: SharedPreferences
-        val connect = ApiConnection()
         lateinit var token: String
-       lateinit var  apiViewModel2:ViewModel2
-       lateinit var  viewModelHelper:ViewModelHelper
+       lateinit var  viewModelHelper: ViewModelHelper
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +53,7 @@ class MainActivity : ComponentActivity() {
         userData_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         mode_sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         expiryDate_sharedpref = PreferenceManager.getDefaultSharedPreferences(this)
-        apiViewModel2 = ViewModelProvider(this).get(ViewModel2::class.java)
+
         viewModelHelper = ViewModelProvider(this).get(ViewModelHelper::class.java)
         updateDate()
         setContent {

@@ -105,7 +105,8 @@ fun campReminder(
 fun updatePointsResponse(
     showMessage: MutableState<Boolean>,
     isSuccess: MutableState<Boolean>,
-    message: MutableState<String>
+    message: MutableState<String>,
+    traineeId:MutableState<String>
 ) {
 
     if (showMessage.value) {
@@ -167,6 +168,7 @@ fun updatePointsResponse(
                                 onClick = {
                                     showMessage.value = false
                                     message.value = ""
+                                    traineeId.value=""
                                     viewModelHelper.setAction(pointsAction)
                                     viewModelHelper.setPointsString("")
                                    viewModelHelper.settTrainee("")
@@ -193,6 +195,7 @@ fun updatePointsResponse(
                                     viewModelHelper.setPoint(0)
                                     showMessage.value = false
                                     message.value = ""
+                                    traineeId.value=""
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = Color.Red
@@ -257,7 +260,7 @@ fun checkEmailResponse(
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color = colorResource(id = R.color.mainColor)
+                            color = Color.Red
                         )
                     }
                     space(h = 10)
@@ -340,7 +343,7 @@ fun checkPasswordResponse(
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color = colorResource(id = R.color.mainColor)
+                            color = Color.Red
                         )
                     }
                     space(h = 10)
@@ -428,7 +431,7 @@ fun checkOtpCodeResponse(
                             modifier = Modifier.weight(1f),
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.bold2)),
-                            color = colorResource(id = R.color.mainColor)
+                            color = Color.Red
                         )
                     }
                     space(h = 10)
@@ -452,8 +455,6 @@ fun checkOtpCodeResponse(
                             val encodedToken = URLEncoder.encode(token2, "UTF-8")
                             if (isSuccess.value)
                                 navController.navigate(ScreensRoute.NewPasswordScreen.route + "/$encodedEmail" + "/$encodedToken")
-                            else
-                                navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = colorResource(id = R.color.mainColor)

@@ -92,7 +92,7 @@ fun selectCamp(
 
                     itemsCase.value = "No Camps"
                 }else{
-
+                      Log.d("camps",response.toString())
                     camps.addAll(response.data)
                 }
                 showProgress.value = false

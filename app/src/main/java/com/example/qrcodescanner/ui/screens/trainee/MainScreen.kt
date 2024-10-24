@@ -141,7 +141,7 @@ fun headerSection(
             ) {
             if (currentUser?.photoUrl == null) {
                 Image(
-                    painterResource(R.drawable.profile_photo),
+                    painterResource(R.drawable.profile2),
                     modifier = Modifier
                         .fillMaxSize(),
                     contentScale = ContentScale.Inside,
